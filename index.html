@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feels Like</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,900&family=Archivo+Black&family=Courier+Prime:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3EEE3;--paper2:#FBF8F1;--ink:#171513;--ink2:#4A453E;--muted:#7A736A;--rule:#D9D1C2;
+  --pink:#FF4FA3;--pinkInk:#B3166A;--blue:#2F5BEA;--blueInk:#1D3FB0;--yellow:#FFE24A;--green:#1E9E63;
+  --display:"Archivo Black","Arial Black","Helvetica Neue",Inter,system-ui,sans-serif;
+  --type:"Courier Prime","American Typewriter","Courier New",Courier,monospace;
+  --body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;color:var(--ink);font:16px/1.5 var(--body);background:var(--paper)}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;mix-blend-mode:multiply}
+.wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto;padding:18px clamp(18px,2.4vw,40px) 70px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* masthead: small, out of the way */
+.mast{padding-bottom:8px;border-bottom:2px solid var(--ink);margin-bottom:18px}
+.title{display:flex;justify-content:space-between;width:100%;font:900 clamp(30px,5.6vw,64px)/1 Archivo,"Archivo Black","Arial Black",sans-serif;font-stretch:125%;font-variation-settings:"wdth" 125;color:var(--ink);text-transform:uppercase}
+.title span{display:block}
+.logo{font:900 17px/0.86 var(--display);letter-spacing:-.02em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:6px 8px 5px;transform:rotate(-2deg)}
+.logo span{color:var(--yellow)}
+.issue{font:13px/1.35 var(--type);color:var(--ink2);flex:1}
+.issue b{color:var(--ink);font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);font-weight:700;font-size:15px;padding:10px 16px;border-radius:999px;cursor:pointer;min-height:44px}
+.btn:hover{background:#000}
+.btn.sec{background:transparent;color:var(--ink)}
+.btn.sec:hover{background:var(--paper2)}
+.btn.sm{font-size:13.5px;padding:6px 12px;min-height:36px}
+.link{background:none;border:0;padding:4px 2px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-weight:600}
+
+/* cards */
+.card{background:var(--paper2);border:2px solid var(--ink);border-radius:4px;padding:18px;box-shadow:4px 4px 0 var(--ink)}
+.kicker{display:inline-block;font:900 12px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:6px 8px 5px;margin:0 0 12px}
+.kicker.pink{background:var(--pink);color:var(--ink)}
+.kicker.yellow{background:var(--yellow);color:var(--ink)}
+h2.sec{font:900 clamp(22px,3.4vw,30px)/1.05 var(--display);letter-spacing:-.01em;text-transform:uppercase;margin:0 0 4px}
+.secHead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:44px 0 14px;border-top:2px solid var(--ink);padding-top:12px}
+.secHead p{margin:0;color:var(--ink2);font-size:15px}
+
+/* feedback strip */
+.fbStrip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--yellow);border:2px solid var(--ink);padding:10px 14px;margin-bottom:18px}
+.fbStrip p{margin:0;flex:1;min-width:200px;font-weight:600}
+
+/* input */
+.inputCard h1{font:900 clamp(28px,5vw,44px)/1 var(--display);text-transform:uppercase;letter-spacing:-.02em;margin:0 0 8px}
+.inputCard .lead{margin:0 0 16px;color:var(--ink2);max-width:60ch}
+.drop{border:2.5px dashed var(--ink);border-radius:4px;padding:22px;text-align:center;background:var(--paper);cursor:pointer;transition:background .15s}
+.drop.over,.drop:hover{background:#fff}
+.drop strong{display:block;font-size:18px;margin-bottom:4px}
+.drop span{color:var(--ink2);font-size:14.5px}
+.or{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.status{margin-top:12px;font:14px var(--type);color:var(--ink2)}
+.status.err{color:var(--pinkInk)}
+.thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.thumbs img{height:84px;border:2px solid var(--ink);transform:rotate(-1.5deg);background:#fff}
+
+.form{display:grid;gap:18px;margin-top:6px}
+.fgroup{border:0;margin:0;padding:0}
+.fgroup legend{font:900 13px var(--display);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;padding:0}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px 12px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:4px}
+.field label i{font-style:normal;font-weight:400;color:var(--muted)}
+.field input,.field select{width:100%;font:16px var(--body);padding:9px 10px;border:2px solid var(--ink);border-radius:3px;background:#fff;color:var(--ink);min-height:44px}
+.field input:focus,.field select:focus{outline:3px solid var(--blue);outline-offset:1px}
+.formActs{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hint{font-size:13.5px;color:var(--ink2);margin:0}
+
+/* hero */
+.exampleNote{font:13px var(--type);background:var(--ink);color:var(--paper);display:inline-block;padding:5px 9px;margin-bottom:12px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;justify-items:start}
+.headline{font:900 clamp(34px,6.4vw,64px)/.98 var(--display);letter-spacing:-.025em;margin:0;text-transform:uppercase;max-width:16ch}
+.headline mark{background:linear-gradient(transparent 58%,var(--pink) 58%,var(--pink) 92%,transparent 92%);color:inherit;padding:0 .04em}
+.subline{font-size:clamp(17px,2.2vw,20px);line-height:1.45;margin:10px 0 0;max-width:60ch;color:var(--ink)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.chip{border:2px solid var(--ink);background:var(--paper2);padding:8px 12px 7px;border-radius:3px;min-width:120px}
+.chip small{display:block;font:12px var(--type);color:var(--ink2)}
+.chip b{font:900 26px/1.05 var(--display)}
+.chip b em{font:600 14px var(--body);font-style:normal;color:var(--ink2);margin-left:4px}
+.plan{margin-top:14px;font-size:14px;color:var(--ink2);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* cutouts */
+.board{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,1.6fr);gap:18px;margin-top:26px}
+.panel{background:#fff;border:2px solid var(--ink);padding:16px 14px 10px;position:relative}
+.panel.bring{background:var(--paper2)}
+.cuts{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px 14px}
+.bring .cuts{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}
+.cut{text-align:center;padding:4px 2px 10px;position:relative}
+.cut .pic{position:relative;display:inline-block;transform:rotate(var(--r,0deg));transition:transform .2s}
+.cut:hover .pic{transform:rotate(0deg) scale(1.04)}
+.cut svg{width:118px;height:118px;display:block;filter:url(#cutout)}
+.bring .cut svg{width:92px;height:92px}
+.cut .pic::before{content:"";position:absolute;top:-6px;left:50%;width:44px;height:16px;margin-left:-22px;background:rgba(255,226,74,.78);transform:rotate(calc(var(--r,0deg) * -2 + 3deg));z-index:2;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.cut .name{display:inline-block;font:900 13px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em;background:var(--ink);color:#fff;padding:5px 7px 4px;margin-top:6px}
+.cut .why{display:block;font-size:13px;line-height:1.35;color:var(--ink2);margin-top:5px;max-width:20ch;margin-left:auto;margin-right:auto}
+.cut.opt .name{background:#fff;color:var(--ink);border:2px dashed var(--ink)}
+.slot{font:12px var(--type);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:2px}
+.emptyBring{color:var(--ink2);font-size:14.5px;padding:10px 4px}
+
+/* layer plan */
+.stops{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:2px solid var(--ink);background:var(--paper2)}
+.stop{padding:14px 16px;border-right:2px solid var(--ink);position:relative}
+.stop:last-child{border-right:0}
+.stop .when{font:13px var(--type);color:var(--ink2)}
+.stop .where{font:900 17px/1.15 var(--display);text-transform:uppercase;margin:2px 0 6px}
+.stop .t{font:900 34px/1 var(--display)}
+.stop .t small{font:600 13px var(--body);color:var(--ink2);margin-left:6px;vertical-align:middle}
+.stop .do{margin:8px 0 0;font-size:15px}
+.stop .do b{background:var(--yellow);padding:0 3px}
+@media (max-width:640px){.stop{border-right:0;border-bottom:2px solid var(--ink)}.stop:last-child{border-bottom:0}}
+
+/* heads up */
+.heads{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.head{border:2px solid var(--ink);background:var(--paper2);padding:12px 14px;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+.head .ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:900 16px var(--display);border:2px solid var(--ink);background:var(--yellow)}
+.head.pk .ic{background:var(--pink)}.head.bl .ic{background:#BFD0FF}
+.head h3{margin:2px 0 3px;font-size:16px}
+.head p{margin:0;font-size:14.5px;color:var(--ink2)}
+
+/* numbers explained */
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.metric{border:2px solid var(--ink);background:#fff;padding:14px 16px}
+.metric .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.metric h3{margin:0;font:900 14px var(--display);text-transform:uppercase;letter-spacing:.03em}
+.metric .val{font:900 30px/1 var(--display);text-align:right;white-space:nowrap}
+.metric .val small{display:block;font:600 13px/1.3 var(--body);color:var(--ink2);margin-top:3px}
+.scale{position:relative;margin:14px 0 22px}
+.bands{display:flex;height:12px;border:2px solid var(--ink)}
+.bands span{flex:1;position:relative}
+.scale{margin-bottom:34px}
+.mlab{position:absolute;top:22px;transform:translateX(-50%);font:700 13px/1 var(--type);background:var(--ink);color:#fff;padding:4px 6px 3px;white-space:nowrap}
+.ends{position:absolute;top:24px;left:0;right:0;display:flex;justify-content:space-between;font:11px var(--type);color:var(--muted);pointer-events:none}
+.marker{position:absolute;top:-7px;width:4px;height:26px;background:var(--ink);margin-left:-2px;border-radius:2px}
+.marker::after{content:"";position:absolute;top:-6px;left:-4px;border:6px solid transparent;border-top-color:var(--ink)}
+.metric p{margin:0 0 6px;font-size:14.5px}
+.metric p.you{color:var(--ink2)}
+.metric p b{font-weight:700}
+
+/* feedback */
+.fbCard{display:grid;gap:14px}
+.fbRow{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:9px 14px;min-height:42px;cursor:pointer;font-weight:600;font-size:14.5px}
+.seg button+button{border-left:2px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button[data-v="cold"][aria-pressed="true"]{background:var(--blue);color:#fff}
+.seg button[data-v="hot"][aria-pressed="true"]{background:var(--pink);color:var(--ink)}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tags button{border:2px solid var(--ink);background:transparent;border-radius:999px;padding:7px 12px;min-height:40px;cursor:pointer;font-size:14px;font-weight:600}
+.tags button[aria-pressed="true"]{background:var(--yellow)}
+.saved{font:14px var(--type);color:var(--green)}
+.fbRow .seg,.fbRow .tags{justify-self:start}
+.stop.past{opacity:.5}.stop.past .when::after{content:" · earlier"}
+@media (max-width:560px){.fbRow{grid-template-columns:1fr}}
+.learned{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.learned li{border-left:4px solid var(--pink);padding:2px 0 2px 10px}
+
+/* source footer */
+.src{margin-top:40px;border-top:2px dashed var(--ink);padding-top:14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:14px;color:var(--ink2)}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(23,21,19,.35);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,94vw);background:var(--paper);border-left:2px solid var(--ink);z-index:41;overflow:auto;padding:20px 20px 40px}
+.drawer h2{font:900 26px/1 var(--display);text-transform:uppercase;margin:0 0 6px}
+.drawer .x{position:absolute;top:14px;right:14px;width:44px;height:44px;border:2px solid var(--ink);background:var(--paper2);border-radius:50%;cursor:pointer;font-size:20px;line-height:1}
+.drawer section{margin-top:22px}
+.drawer h3{font:900 14px var(--display);text-transform:uppercase;margin:0 0 10px;letter-spacing:.03em}
+.unitSeg{margin-top:2px}
+.history{font-size:14px;color:var(--ink2);margin:8px 0 0;padding-left:18px}
+[hidden]{display:none!important}
+.locStart{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#diag{display:none}
+.goodday{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+@media (max-width:700px){.goodday{grid-template-columns:1fr}}
+.gdCol{background:var(--paper2);border:2px solid var(--ink);padding:16px 18px}
+.gdH{font:900 clamp(20px,2.4vw,26px)/1.05 var(--display);text-transform:uppercase;margin:0 0 12px;letter-spacing:-.01em}
+.gdCol ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.gdCol li b{font-weight:700;font-size:16px;background:linear-gradient(transparent 55%,var(--yellow) 55%,var(--yellow) 92%,transparent 92%)}
+.gdCol li span{display:block;font-size:13.5px;color:var(--ink2);margin-top:1px}
+.gdCol.bad{background:transparent;border-style:dashed}
+.gdCol.bad li b{background:none;text-decoration:line-through;text-decoration-color:var(--pink);text-decoration-thickness:3px}
+/* ---- hero: date → weather → outfit ---- */
+/* wide: weather | outfit | good/bad, side by side.  medium: weather | outfit, lists underneath.  narrow: one column */
+.top2{display:grid;grid-template-columns:minmax(260px,1fr) minmax(460px,1.75fr) minmax(250px,.95fr);gap:22px 26px;align-items:start}
+.top2>.goodday{margin-top:0;grid-template-columns:1fr;gap:14px}
+.top2>.goodday .gdH{font-size:20px}
+.top2>.goodday .gdCol{padding:14px 16px}
+.top2>.goodday li b{font-size:15px}
+@media (max-width:1240px){.top2{grid-template-columns:minmax(290px,4fr) minmax(0,7fr)}.top2>.goodday{grid-column:1/-1;grid-template-columns:1fr 1fr}}
+@media (max-width:1100px){.top2{grid-template-columns:1fr}}
+@media (max-width:700px){.top2>.goodday{grid-template-columns:1fr}}
+.top2>div:first-child{container-type:inline-size;min-width:0}
+.dateRow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+/* same arrangement every day, whatever the day's name: name on top, date + switch below; one row when there's room for any name */
+.dateBar{display:grid;grid-template-columns:1fr auto;grid-template-areas:"name name" "meta tabs";align-items:center;gap:8px 14px}
+.dateBar .dateH{grid-area:name}
+.dateBar .dateSub{grid-area:meta;line-height:1.3}
+.placeBtn{font:inherit;color:inherit;padding:0;text-decoration-style:dotted}
+.dateBar .dayTabs{grid-area:tabs;margin:0}
+@container (min-width:760px){.dateBar{grid-template-columns:auto 1fr auto;grid-template-areas:"name meta tabs"}.dateBar .dateSub{padding-top:4px}}
+.dayTabs.sm button{padding:5px 11px;min-height:34px;font-size:13px}
+.dateH{margin:0;font:900 min(60px,12cqw)/.9 var(--display);overflow-wrap:anywhere;text-transform:uppercase;letter-spacing:-.03em}
+.dateSub{font:15px var(--type);color:var(--ink2);margin:0}
+.wxBlock{margin-top:22px;border-top:2px solid var(--ink);padding-top:16px}
+.wxMain{display:flex;align-items:center;gap:.16em;font-size:min(128px,26cqw)}
+.wxIcon{display:flex;align-items:center}
+.wxIcon svg{width:.9em;height:.9em;display:block;filter:url(#cutout);transform:translateY(-.06em)}
+.bigT{font:900 1em/.74 var(--display);padding-top:.04em;letter-spacing:-.04em}
+.bigL{font:13px/1.3 var(--type);color:var(--ink2);margin-top:8px}
+.cond{font:900 clamp(22px,2.6vw,28px)/1.1 var(--display);text-transform:uppercase;margin:14px 0 4px}
+.hl{font-size:16px;color:var(--ink2);margin:0}
+.hl b{color:var(--ink)}
+.desc{font-size:18px;line-height:1.45;margin:12px 0 0}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));border:2px solid var(--ink);margin-top:18px;background:var(--paper2)}
+.strip div{padding:10px 10px 9px;border-right:2px solid var(--ink)}
+.strip div:last-child{border-right:0}
+.strip small{display:block;font:12px var(--type);color:var(--ink2)}
+.strip b{display:block;font:900 26px/1.05 var(--display);margin:2px 0}
+.strip span{font-size:13px;line-height:1.3;display:block}
+.strip .past{opacity:.5}
+.strip div{position:relative}
+.strip .now{background:#fff;box-shadow:inset 0 5px 0 var(--pink)}
+.nowTag{position:absolute;top:-12px;left:6px;white-space:nowrap;font:700 11px/1 var(--type);font-style:normal;background:var(--pink);color:var(--ink);padding:4px 6px 3px;border:2px solid var(--ink)}
+.strip .now small{margin-top:4px}
+.nowLine{font:13px var(--type);margin:16px 0 -10px;color:var(--ink2)}
+.stage{background:#fff;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:16px 16px 14px;position:relative}
+.stageHead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.stageHead h2{font:900 15px var(--display);text-transform:uppercase;letter-spacing:.04em;margin:0;background:var(--ink);color:#fff;padding:6px 8px 5px}
+.caption mark{background:linear-gradient(transparent 55%,var(--pink) 55%,var(--pink) 92%,transparent 92%);color:inherit}
+.caption{font:900 clamp(17px,1.8vw,21px)/1.15 var(--display);text-transform:uppercase;margin:4px 0 0;text-align:center}
+.dollStage{position:relative;display:grid;grid-template-columns:1fr minmax(160px,210px) 1fr;gap:0 18px;align-items:start;margin-top:8px}
+.leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1}
+.leaders path{fill:none;stroke:var(--ink);stroke-width:1.5}
+.leaders circle{fill:var(--ink)}
+.tag{all:unset;box-sizing:border-box;position:absolute;z-index:2;padding:5px 8px;border-radius:2px;transition:background .15s;cursor:default}
+.tag.side-l{text-align:right}
+.tag:hover,.tag.hi{background:var(--yellow)}
+.tag:focus-visible{outline:3px solid var(--blue)}
+.tag b{display:block;font:900 13px/1.15 var(--display);text-transform:uppercase}
+.tag span{display:block;font-size:12.5px;line-height:1.3;color:var(--ink2);margin-top:2px}
+.tag .under{font:12px var(--type);color:var(--pinkInk);margin-top:2px}
+.bagRow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-start;border-top:2px dashed var(--ink);margin-top:14px;padding-top:12px}
+.bagRow .listH{width:100%;margin:0}
+.bagTag{position:static;border:2px solid var(--ink);max-width:220px}
+@media (max-width:560px){.dollStage{grid-template-columns:1fr 150px 1fr;gap:0 10px}.tag{padding:4px 2px}.tag b{font-size:11px}.tag span{display:none}.tag .under{display:none}}
+.doll svg{width:100%;max-width:290px;margin:0 auto;height:auto;display:block;overflow:visible;max-height:560px}
+.doll .g{transition:transform .28s ease-out;pointer-events:none;transform-box:fill-box;transform-origin:50% 50%}
+.doll .g.hi:not(.lift-top):not(.lift-legs){transform:translateY(-5px) scale(1.06)}
+.doll .hit{fill:transparent;stroke:transparent;cursor:pointer}
+.doll .g{filter:url(#cutout)}
+.doll.peek-top .g.lift-top{transform:translate(62px,-4px) rotate(6deg)}
+.doll .g.lift-top.hi:not(.x),.doll .g.lift-legs.hi:not(.x){transform:translateY(-4px) scale(1.03)}
+.doll.peek-top .g.lift-top.hi{transform:translate(62px,-4px) rotate(6deg)}
+.doll.peek-legs .g.lift-legs.hi{transform:translate(-58px,4px) rotate(-5deg)}
+.doll.peek-legs .g.lift-legs{transform:translate(-58px,4px) rotate(-5deg)}
+.doll .g:focus{outline:none}
+.tagList{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.tagList li button{all:unset;display:block;cursor:default;padding:8px 10px;transition:background .15s;border-left:4px solid var(--ink);border-radius:2px;width:100%;box-sizing:border-box}
+.tagList li button:hover,.tagList li button:focus-visible,.tagList li button.hi{background:var(--yellow)}
+.tagList li button:focus-visible{outline:3px solid var(--blue)}
+.tagList b{display:block;font:900 13px/1.15 var(--display);text-transform:uppercase}
+.tagList span{display:block;font-size:13px;line-height:1.35;color:var(--ink2);margin-top:2px}
+.tagList .under{font:12px var(--type);color:var(--pinkInk);margin-top:3px}
+.listH{font:12px var(--type);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 6px}
+.right .tagList li button{border-left:0;border-right:4px solid var(--yellow);text-align:right}
+.right{text-align:right}
+.peekHint{font:12px var(--type);color:var(--ink2);text-align:center;margin-top:4px}
+.dayTabs{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;margin-bottom:14px}
+.dayTabs button{border:0;background:transparent;padding:8px 16px;min-height:40px;font-weight:700;font-size:14.5px;cursor:pointer}
+.dayTabs button+button{border-left:2px solid var(--ink)}
+.dayTabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.plan select,.plan input{font:600 14px var(--body);border:2px solid var(--ink);border-radius:3px;background:#fff;padding:5px 8px;min-height:36px;color:var(--ink)}
+.plan label{font-weight:600;color:var(--ink)}
+.loadCard{display:flex;gap:14px;align-items:center}
+.spin{width:22px;height:22px;border:3px solid var(--rule);border-top-color:var(--ink);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.locRes{display:grid;gap:6px;margin-top:8px}
+.locRes button{text-align:left;border:2px solid var(--ink);background:#fff;padding:8px 10px;cursor:pointer;font-weight:600;border-radius:3px}
+.locRes button[aria-current="true"]{background:var(--yellow)}
+.locRow{display:flex;gap:8px;align-items:flex-end}.locRow .field{flex:1}
+
+@media (max-width:760px){.board{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<!-- paper grain + cutout filter, defined once -->
+<svg class="grain" aria-hidden="true" width="100%" height="100%"><filter id="paperNoise"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .22  0 0 0 .22 0"/></filter><rect width="100%" height="100%" filter="url(#paperNoise)"/></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="cutout" x="-20%" y="-20%" width="140%" height="140%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="4.5" result="grow"/>
+      <feFlood flood-color="#fff"/><feComposite in2="grow" operator="in" result="edge"/>
+      <feOffset in="grow" dx="3" dy="4" result="off"/><feFlood flood-color="#171513" flood-opacity=".28"/><feComposite in2="off" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="ht" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="2.5" cy="2.5" r="1.05" fill="#171513"/></pattern>
+    <!-- textiles, printed in the same inks -->
+    <pattern id="p-breton" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="5" fill="#3255A4"/></pattern>
+    <pattern id="p-pinstripe" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="2.2" fill="#FF48B0"/></pattern>
+    <pattern id="p-rib" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="2" height="6" fill="#171513" opacity=".22"/></pattern>
+    <pattern id="p-knit" width="10" height="8" patternUnits="userSpaceOnUse"><path d="M0 1 L5 6 L10 1" fill="none" stroke="#F7F3EA" stroke-width="1.6" opacity=".75"/></pattern>
+    <pattern id="p-gingham" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="7" height="14" fill="#3255A4" opacity=".55"/><rect width="14" height="7" fill="#3255A4" opacity=".55"/></pattern>
+    <pattern id="p-gingham-pink" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="6" height="12" fill="#FF48B0" opacity=".5"/><rect width="12" height="6" fill="#FF48B0" opacity=".5"/></pattern>
+    <pattern id="p-twill" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="1.6" height="6" fill="#F7F3EA" opacity=".35"/></pattern>
+    <pattern id="p-tweed" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8 L4 4 M4 8 L8 4 M2 2 L4 0 M6 2 L8 0" stroke="#171513" stroke-width="1.3" opacity=".45"/><circle cx="6" cy="6" r=".9" fill="#F7F3EA" opacity=".6"/></pattern>
+    <pattern id="p-pin" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="1" height="10" fill="#F7F3EA" opacity=".45"/></pattern>
+    <pattern id="p-dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="3" fill="#F7F3EA"/><circle cx="12" cy="12" r="3" fill="#F7F3EA"/></pattern>
+    <pattern id="p-dots-small" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.6" fill="#FF48B0"/><circle cx="7" cy="7" r="1.6" fill="#FF48B0"/></pattern>
+    <pattern id="p-tartan" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="5" fill="#FF6C2F" opacity=".7"/><rect width="5" height="18" fill="#FF6C2F" opacity=".7"/><rect y="11" width="18" height="1.6" fill="#171513" opacity=".5"/><rect x="11" width="1.6" height="18" fill="#171513" opacity=".5"/></pattern>
+    <pattern id="p-sole" width="300" height="560" patternUnits="userSpaceOnUse"><rect y="512" width="300" height="12" fill="#3255A4"/></pattern>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="title" role="heading" aria-level="1" aria-label="Feels Like"><span aria-hidden="true">F</span><span aria-hidden="true">E</span><span aria-hidden="true">E</span><span aria-hidden="true">L</span><span aria-hidden="true">S</span><span aria-hidden="true">&nbsp;</span><span aria-hidden="true">L</span><span aria-hidden="true">I</span><span aria-hidden="true">K</span><span aria-hidden="true">E</span></div>
+    <div class="issue" id="issue" hidden></div>
+  </header>
+
+  <div class="fbStrip" id="fbStrip" hidden>
+    <p id="fbStripText"></p>
+    <button class="btn sm" id="fbStripGo">Tell me</button>
+    <button class="link" id="fbStripSkip">Skip</button>
+  </div>
+
+  <!-- 1 · getting today's numbers -->
+  <section class="card inputCard" id="inputCard" aria-labelledby="inTitle">
+    <div id="inStart">
+      <h1 id="inTitle">Where are you?</h1>
+      <p class="lead">Feels Like uses your location to get today's forecast. It's only used to look up the weather and stays in this browser.</p>
+      <div class="locStart">
+        <button class="btn" id="useLoc" type="button">Use my location</button>
+        <span class="hint">or</span>
+        <div class="field" style="flex:1;min-width:180px"><label class="sr" for="cityQ">City</label><input id="cityQ" type="text" placeholder="Type a city"></div>
+        <button class="btn sec" id="cityFind" type="button">Find</button>
+      </div>
+      <div class="locRes" id="cityRes"></div>
+      <div class="drop" id="drop" role="button" tabindex="0" aria-describedby="dropHelp">
+        <strong>Drop or paste a screenshot</strong>
+        <span id="dropHelp">Or click to choose one. Add a second screenshot if the details are on another screen.</span>
+        <input type="file" id="file" accept="image/*" multiple hidden>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="status" id="readStatus" role="status" aria-live="polite"></div>
+      <div class="or">
+        <button class="btn sec" id="typeBtn">Type the numbers instead</button>
+        <span class="hint">or see an example day:</span>
+        <button class="link" data-ex="wind">Windy November</button>
+        <button class="link" data-ex="rain">Rainy &amp; raw</button>
+        <button class="link" data-ex="sticky">Sticky summer</button>
+      </div>
+    </div>
+
+    <form class="form" id="wxForm" hidden novalidate>
+      <div>
+        <h1 id="formTitle" style="font-size:clamp(24px,4vw,34px)">Check today's numbers</h1>
+        <p class="hint" id="formHint">Fill in what your app shows. Only high, low and rain chance are needed; the rest makes the report sharper.</p>
+      </div>
+      <fieldset class="fgroup"><legend>Temperature</legend>
+        <div class="fgrid">
+          <div class="field"><label for="f-high">High <i id="uT1">°F</i></label><input id="f-high" type="number" inputmode="decimal" required></div>
+          <div class="field"><label for="f-low">Low <i id="uT2">°F</i></label><input id="f-low" type="number" inputmode="decimal" required></div>
+          <div class="field"><label for="f-now">Right now <i>optional</i></label><input id="f-now" type="number" inputmode="decimal"></div>
+          <div class="field"><label for="f-feels">Feels like now <i>optional</i></label><input id="f-feels" type="number" inputmode="decimal"></div>
+        </div>
+      </fieldset>
+      <fieldset class="fgroup"><legend>Rain &amp; sky</legend>
+        <div class="fgrid">
+          <div class="field"><label for="f-pop">Rain chance <i>%</i></label><input id="f-pop" type="number" inputmode="numeric" min="0" max="100" required></div>
+          <div class="field"><label for="f-amt">Amount <i id="uR">in</i></label><input id="f-amt" type="number" inputmode="decimal" step="0.01" min="0"></div>
+          <div class="field"><label for="f-when">Rain mostly</label><select id="f-when"><option value="">Not sure</option><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option><option value="all">All day</option></select></div>
+          <div class="field"><label for="f-cond">Sky</label><select id="f-cond"><option value="clear">Sunny / clear</option><option value="partly">Partly cloudy</option><option value="cloudy">Cloudy</option><option value="rain">Rain</option><option value="storm">Thunderstorms</option><option value="snow">Snow</option><option value="fog">Fog</option></select></div>
+        </div>
+      </fieldset>
+      <fieldset class="fgroup"><legend>Air</legend>
+        <div class="fgrid">
+          <div class="field"><label for="f-wind">Wind <i id="uW1">mph</i></label><input id="f-wind" type="number" inputmode="decimal" min="0"></div>
+          <div class="field"><label for="f-gust">Gusts <i>optional</i></label><input id="f-gust" type="number" inputmode="decimal" min="0"></div>
+          <div class="field"><label for="f-rh">Humidity <i>%</i></label><input id="f-rh" type="number" inputmode="numeric" min="0" max="100"></div>
+          <div class="field"><label for="f-dew">Dew point <i>optional</i></label><input id="f-dew" type="number" inputmode="decimal"></div>
+          <div class="field"><label for="f-uv">UV index</label><input id="f-uv" type="number" inputmode="numeric" min="0" max="15"></div>
+          <div class="field"><label for="f-aqi">Air quality <i>AQI</i></label><input id="f-aqi" type="number" inputmode="numeric" min="0"></div>
+          <div class="field"><label for="f-sunset">Sunset</label><input id="f-sunset" type="time"></div>
+        </div>
+      </fieldset>
+      <fieldset class="fgroup"><legend>Your day</legend>
+        <div class="fgrid">
+          <div class="field"><label for="f-act">Today I'm mostly</label><select id="f-act"><option value="desk">Sitting (class, desk)</option><option value="feet">On my feet, walking around</option><option value="out">Working out outside</option><option value="gym">Working out inside</option></select></div>
+          <div class="field" id="actTimeField" hidden><label for="f-actTime">Workout at</label><input id="f-actTime" type="time" value="18:30"></div>
+        </div>
+      </fieldset>
+      <div class="formActs">
+        <button class="btn" type="submit">Make my report</button>
+        <button class="btn sec" type="button" id="formCancel">Back</button>
+        <span class="status err" id="formErr" role="alert"></span>
+      </div>
+    </form>
+  </section>
+
+  <!-- 2 · the report -->
+  <section class="card loadCard" id="loadCard" hidden role="status"><div class="spin" aria-hidden="true"></div><div><b id="loadText">Getting today's forecast…</b><div class="hint">From Open-Meteo</div><div id="diag" style="font:12px var(--type);color:var(--muted);margin-top:6px"></div></div></section>
+  <main id="report" hidden></main>
+</div>
+
+<!-- setup drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <button class="x" id="dClose" aria-label="Close">✕</button>
+  <h2 id="dTitle">Your setup</h2>
+  <p class="hint">Used for every report. Changes apply right away.</p>
+  <section>
+    <h3>Where</h3>
+    <div class="locRow"><div class="field"><label for="s-loc">Place</label><input id="s-loc" type="text" placeholder="City or ZIP code"></div><button class="btn sec sm" id="locFind" type="button" hidden style="min-height:44px">Find</button></div>
+    <p class="hint" id="locNow" style="margin-top:6px"></p>
+    <button class="btn sec sm" id="useLoc2" type="button" style="margin-top:6px">Use my location</button>
+    <div class="locRes" id="locRes"></div>
+  </section>
+  <section>
+    <h3>Commute</h3>
+    <div class="fgrid">
+      <div class="field"><label for="s-mode">Getting around</label><select id="s-mode"><option value="subway">Subway</option><option value="walk">Walking</option><option value="bus">Bus</option><option value="bike">Bike</option><option value="car">Car / taxi</option><option value="none">Not commuting</option></select></div>
+      <div class="field"><label for="s-leave">Leave home</label><input id="s-leave" type="time"></div>
+      <div class="field"><label for="s-back">Head home</label><input id="s-back" type="time"></div>
+      <div class="field"><label for="s-mins">Minutes outside <i>each way</i></label><input id="s-mins" type="number" min="0" max="120" inputmode="numeric"></div>
+    </div>
+  </section>
+  <section>
+    <h3>Units</h3>
+    <div class="seg unitSeg" role="group" aria-label="Temperature units"><button type="button" data-unit="F">°F, mph, in</button><button type="button" data-unit="C">°C, km/h, mm</button></div>
+  </section>
+  <section>
+    <h3>What I've learned about you</h3>
+    <ul class="learned" id="learnedList"></ul>
+    <ol class="history" id="historyList"></ol>
+    <p style="margin-top:12px"><button class="link" id="resetLearn">Forget what I've learned</button></p>
+  </section>
+  <p class="hint" id="storeNote" style="margin-top:24px"></p>
+</aside>
+
+<script>
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const num=v=>{if(v===""||v==null)return null;const n=Number(v);return Number.isFinite(n)?n:null};
+const todayKey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const dayName=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:"long"})};
+
+/* ---------------- state ---------------- */
+const DEFAULT={v:1,settings:{loc:"New York",units:"F",mode:"subway",leave:"08:30",back:"18:00",mins:10},days:{},skipFb:{}};
+let S=JSON.parse(JSON.stringify(DEFAULT));
+let shots=[];          // screenshot blobs waiting to be read
+let isExample=false;   // report shows an example, not saved
+let current=null;      // {wx, plan, src}
+
+/* ---------------- storage: per-person db, else this browser ---------------- */
+let dbDoc=null,dbRef=null,saveChain=Promise.resolve(),storeKind="none";
+function lsGet(){try{return JSON.parse(localStorage.getItem("feelslike")||"null")}catch(e){return null}}
+function lsSet(v){try{localStorage.setItem("feelslike",JSON.stringify(v));return true}catch(e){return false}}
+function merge(x){if(!x||typeof x!=="object")return;x=JSON.parse(JSON.stringify(x));S={...DEFAULT,...x,settings:{...DEFAULT.settings,...(x.settings||{})},days:x.days||{},skipFb:x.skipFb||{}}}
+function save(){
+  // keep 60 days
+  const keys=Object.keys(S.days).sort();while(keys.length>60)delete S.days[keys.shift()];
+  lsSet(S);
+  if(dbDoc){const snap=JSON.parse(JSON.stringify(S));saveChain=saveChain.then(()=>dbDoc.set(snap)).catch(()=>{});}
+}
+merge(lsGet());storeKind=lsGet()?"browser":"none";
+async function connectDb(){
+  try{
+    const w=window.claude;if(!w||!w.use)return;
+    const [db,user]=await Promise.all([w.use("db"),w.use("user")]);
+    diag("db",db?"ready":"unavailable");if(!db)return;dbRef=db;readCache();
+    if(!user)return;
+    const uid=await user.id();if(!uid)return;
+    const ref=db.doc("data/users/"+uid+"/feelslike");
+    const snap=await Promise.race([ref.get(),new Promise((_,r)=>setTimeout(()=>r(new Error("t")),10000))]);
+    dbDoc=ref;storeKind="account";
+    if(snap.exists){merge(snap.data());lsSet(S);renderAll()}
+    else{await ref.set(JSON.parse(JSON.stringify(S)))}
+    noteStore();
+  }catch(e){dbDoc=null;noteStore()}
+}
+
+/* ---------------- units ---------------- */
+const U=()=>S.settings.units;
+const toF=c=>c*9/5+32,toC=f=>(f-32)*5/9;
+const T=f=>f==null?"–":Math.round(U()==="C"?toC(f):f)+"°";
+const dT=d=>Math.round(U()==="C"?d*5/9:d)+"°";
+const W=m=>m==null?"–":Math.round(U()==="C"?m*1.609:m)+(U()==="C"?" km/h":" mph");
+const R=i=>i==null?"–":(U()==="C"?Math.round(i*25.4*10)/10+" mm":(Math.round(i*100)/100)+" in");
+const inT=v=>v==null?null:(U()==="C"?toF(v):v);       // form → °F
+const inW=v=>v==null?null:(U()==="C"?v/1.609:v);
+const inR=v=>v==null?null:(U()==="C"?v/25.4:v);
+const outT=f=>f==null?"":Math.round(U()==="C"?toC(f):f);
+const outW=m=>m==null?"":Math.round(U()==="C"?m*1.609:m);
+const outR=i=>i==null?"":(U()==="C"?Math.round(i*25.4*10)/10:Math.round(i*100)/100);
+const hm=s=>{if(!s)return null;const [h,m]=s.split(":").map(Number);return h+(m||0)/60};
+const clock=h=>{h=((h%24)+24)%24;let H=Math.floor(h),M=Math.round((h-H)*60);if(M===60){H++;M=0}const ap=H>=12?"pm":"am";const h12=H%12||12;return h12+(M?":"+String(M).padStart(2,"0"):"")+ap};
+
+/* ---------------- weather science ---------------- */
+function dewFrom(Tf,rh){const t=toC(Tf),a=17.625,b=243.04,g=Math.log(rh/100)+a*t/(b+t);return toF(b*g/(a-g))}
+function rhFrom(Tf,Tdf){const t=toC(Tf),d=toC(Tdf),a=17.625,b=243.04;return clamp(100*Math.exp(a*d/(b+d)-a*t/(b+t)),1,100)}
+function windChill(Tf,v){return 35.74+.6215*Tf-35.75*Math.pow(v,.16)+.4275*Tf*Math.pow(v,.16)}
+function heatIndex(Tf,rh){
+  let hi=.5*(Tf+61+(Tf-68)*1.2+rh*.094);if((hi+Tf)/2<80)return hi;
+  hi=-42.379+2.04901523*Tf+10.14333127*rh-.22475541*Tf*rh-.00683783*Tf*Tf-.05481717*rh*rh+.00122874*Tf*Tf*rh+.00085282*Tf*rh*rh-.00000199*Tf*Tf*rh*rh;
+  if(rh<13&&Tf<=112)hi-=((13-rh)/4)*Math.sqrt((17-Math.abs(Tf-95))/17);
+  if(rh>85&&Tf<=87)hi+=((rh-85)/10)*((87-Tf)/5);return hi}
+function feels(Tf,v,rh){if(Tf<=50&&v>=3)return windChill(Tf,v);if(Tf>=80)return heatIndex(Tf,rh);return Tf}
+function modelTemp(h,lo,hi){h=((h%24)+24)%24;if(h>=6&&h<=15)return lo+(hi-lo)*(1-Math.cos(Math.PI*(h-6)/9))/2;const x=h<6?h+24:h;return hi-(hi-lo)*(1-Math.cos(Math.PI*(x-15)/15))/2}
+
+/* build an hour-by-hour day from whatever we have */
+function hourly(wx){
+  const H=[];const dew=wx.dew!=null?wx.dew:(wx.rh!=null?dewFrom((wx.high+wx.low)/2,wx.rh):null);
+  const given=(wx.hourly||[]).filter(x=>x&&x.hour!=null).sort((a,b)=>a.hour-b.hour);
+  const gT=given.filter(x=>x.temp!=null),gP=given.filter(x=>x.rainChance!=null);
+  const interp=(arr,key,h,fb)=>{if(!arr.length)return fb;if(h<arr[0].hour||h>arr[arr.length-1].hour)return fb;for(let i=0;i<arr.length-1;i++){const a=arr[i],b=arr[i+1];if(h>=a.hour&&h<=b.hour){const t=(h-a.hour)/((b.hour-a.hour)||1);return a[key]+(b[key]-a[key])*t}}return arr[arr.length-1][key]};
+  const win={morning:[6,12],afternoon:[12,18],evening:[18,24],all:[0,24]}[wx.rainWhen]||null;
+  for(let h=0;h<24;h++){
+    const t=interp(gT,"temp",h,modelTemp(h,wx.low,wx.high));
+    const rh=dew!=null?rhFrom(t,Math.min(dew,t)):(wx.rh??55);
+    let pop=wx.pop??0;if(win)pop=(h>=win[0]&&h<win[1])?pop:Math.round(pop*.3);
+    pop=interp(gP,"rainChance",h,pop);
+    H.push({h,t,rh,pop,f:feels(t,wx.wind||0,rh)});
+  }
+  const gF=given.filter(x=>x.feels!=null);
+  if(gF.length){H.forEach(x=>{const v=interp(gF,"feels",x.h,null);if(v!=null)x.f=v});return {H,dew}}
+  // nudge to the app's own "feels like" if it gave one
+  if(wx.feels!=null){const nowH=new Date().getHours();const base=wx.now!=null?feels(wx.now,wx.wind||0,H[nowH].rh):H[nowH].f;const bias=clamp(wx.feels-base,-8,8);H.forEach(x=>x.f+=bias)}
+  return {H,dew};
+}
+
+/* ---------------- what you've taught it ---------------- */
+function learned(){
+  const fb=Object.entries(S.days).filter(([k,d])=>d.fb&&d.fb.when).sort((a,b)=>a[0]<b[0]?1:-1);
+  let out=0,inn=0,umb=0,n=0;
+  fb.forEach(([k,d],i)=>{const w=Math.pow(.88,i);n++;
+    if(d.fb.out==="cold")out+=2.5*w;if(d.fb.out==="hot")out-=2.5*w;
+    if(d.fb.in==="cold")inn+=2*w;if(d.fb.in==="hot")inn-=2*w;
+    const tags=d.fb.tags||[];if(tags.includes("warmer"))out+=1.2*w;if(tags.includes("lighter"))out-=1.2*w;
+    if(tags.includes("umbrella"))umb+=10*w;if(tags.includes("noUmbrella"))umb-=6*w;});
+  return {out:clamp(out,-12,12),inn:clamp(inn,-8,8),umbrella:clamp(40-umb,15,70),n,fb};
+}
+const runs=(v,where)=>Math.abs(v)<1?null:"you run about "+dT(Math.abs(v))+" "+(v>0?"cold":"warm")+" "+where;
+
+/* ---------------- clothing ---------------- */
+// a small set of risograph inks (blue, fluorescent pink, yellow, teal, orange, black) on paper, plus textile patterns
+const INK={blue:"#3255A4",blueT:"#9DB2E0",pink:"#FF48B0",pinkT:"#FFB8DC",yellow:"#FFD93B",teal:"#1F8A8A",orange:"#FF6C2F",black:"#2E2C2A",paper:"#F7F3EA"};
+const ITEM={
+  tank:{n:"Tank top",c:INK.orange,p:"p-rib"},tee:{n:"T-shirt",c:INK.paper,p:"p-breton"},longsleeve:{n:"Long sleeve",c:INK.yellow,p:"p-pinstripe"},sweater:{n:"Sweater",c:INK.pink,p:"p-knit"},
+  overshirt:{n:"Light overshirt",c:INK.paper,p:"p-gingham"},lightjacket:{n:"Light jacket",c:INK.teal},jacket:{n:"Warm jacket",c:INK.blue,p:"p-twill"},
+  woolcoat:{n:"Wool coat",c:INK.blue,p:"p-tweed"},puffer:{n:"Puffer",c:INK.orange},raincoat:{n:"Rain jacket",c:INK.yellow},
+  shorts:{n:"Shorts or skirt",c:INK.paper,p:"p-gingham-pink"},pants:{n:"Pants",c:INK.black,p:"p-pin"},thermals:{n:"Thermal leggings",c:INK.pinkT,p:"p-rib"},
+  sneakers:{n:"Sneakers",c:INK.paper,p:"p-sole"},boots:{n:"Boots",c:INK.black},rainboots:{n:"Rain boots",c:INK.yellow},sandals:{n:"Sandals",c:INK.orange},snowboots:{n:"Snow boots",c:INK.teal,p:"p-knit"},
+  umbrella:{n:"Umbrella",c:INK.pink,p:"p-dots"},scarf:{n:"Scarf",c:INK.paper,p:"p-tartan"},beanie:{n:"Hat",c:INK.yellow,p:"p-knit"},gloves:{n:"Gloves",c:INK.teal,p:"p-knit"},
+  sunglasses:{n:"Sunglasses",c:INK.black},sunscreen:{n:"Sunscreen",c:INK.pinkT},cap:{n:"Cap",c:INK.teal},water:{n:"Water bottle",c:INK.blueT},mask:{n:"N95 mask",c:INK.paper,p:"p-dots-small"},
+};
+const P={ // simple flat shapes, 120×120
+ tee:'<path d="M32 22 48 15q12 11 24 0l16 7 18 22-15 10-6-7v57H35V47l-6 7-15-10Z"/>',
+ tank:'<path d="M41 14h10q9 19 18 0h10q0 23 9 33v61H32V47q9-10 9-33Z"/>',
+ longsleeve:'<path d="M34 20 48 14q12 10 24 0l14 6 18 70-13 4-8-40v50H37V54l-8 40-13-4Z"/>',
+ sweater:'<path d="M34 20 48 14q12 10 24 0l14 6 18 70-13 4-8-40v50H37V54l-8 40-13-4Z"/>',
+ overshirt:'<path d="M33 18 50 12l10 12 10-12 17 6 17 72-13 4-8-40v54H37V54l-8 40-13-4Z"/>',
+ lightjacket:'<path d="M33 18 50 12l10 12 10-12 17 6 17 72-13 4-8-40v54H37V54l-8 40-13-4Z"/>',
+ jacket:'<path d="M31 18 50 10l10 14 10-14 19 8 17 74-14 4-7-38v54H35V56l-7 38-14-4Z"/>',
+ woolcoat:'<path d="M32 16 50 9l10 16 10-16 18 7 16 76-13 4-6-36v54H35V60l-6 36-13-4Z"/>',
+ puffer:'<path d="M28 22q10-12 22-12h20q12 0 22 12l14 66q-6 6-16 6l-5-30v44H35V64l-5 30q-10 0-16-6Z"/>',
+ raincoat:'<path d="M42 30q0-22 18-22t18 22l12 2 16 64-13 4-7-34v50H34V66l-7 34-13-4 16-64Z"/>',
+ shorts:'<path d="M32 30h56l7 52-28 4-7-26-7 26-28-4Z"/>',
+ pants:'<path d="M36 12h48l6 98H68l-8-60-8 60H30Z"/>',
+ thermals:'<path d="M40 12h40l3 98H67l-7-62-7 62H37Z"/>',
+ sneakers:'<path d="M12 72q2-20 22-22l14 8q22 6 46 10 16 3 14 18H12Z"/><path d="M12 86h96v8H12Z"/>',
+ boots:'<path d="M34 16h30l2 54q26 2 36 16v12H30Z"/>',
+ rainboots:'<path d="M32 14h34l2 56q26 2 36 16v12H28Z"/>',
+ snowboots:'<path d="M28 18h40l2 50q28 2 36 18v14H26Z"/>',
+ sandals:'<path d="M14 78q2-10 14-10h70q12 0 12 10v8H14Z"/><path d="M40 70q6-24 24-24t26 24h-8q-6-16-18-16t-16 16Z"/>',
+ umbrella:'<path d="M12 60Q16 18 60 16q44 2 48 44Z"/><path d="M57 58h6v38q0 12-12 12t-12-12h6q0 6 6 6t6-6Z"/>',
+ scarf:'<path d="M22 28q38-20 76 0l-4 14q-34-16-68 0Z"/><path d="M54 40h16l2 58-9 7-9-7Z"/><path d="M72 38h14l-1 52-8 6-7-6Z"/>',
+ beanie:'<path d="M24 76q0-46 36-46t36 46Z"/><path d="M20 74h80v18H20Z"/><circle cx="60" cy="24" r="12"/>',
+ gloves:'<path d="M30 104V58q-12-6-12-16 6-6 16 4V30q0-6 6-6t6 6V22q0-6 6-6t6 6v4q0-6 6-6t6 6v32q0 22-10 46Z"/>',
+ sunglasses:'<path d="M14 48h38q4 28-18 28T14 52Z"/><path d="M68 48h38q0 28-22 28T68 52Z"/><path d="M50 48h20v6H50Z"/>',
+ sunscreen:'<path d="M44 12h32v16H44Z"/><path d="M38 28h44q8 0 8 10v62q0 10-10 10H40q-10 0-10-10V38q0-10 8-10Z"/>',
+ cap:'<path d="M22 72q0-40 38-40t38 40Z"/><path d="M60 66h52q-4 14-26 14H60Z"/>',
+ water:'<path d="M48 8h24v14H48Z"/><path d="M42 22h36q8 0 8 12v66q0 12-12 12H46q-12 0-12-12V34q0-12 8-12Z"/>',
+ mask:'<path d="M14 46q46-20 92 0v24q-46 30-92 0Z"/>',
+};
+const DETAIL={ // ink linework on top
+ sweater:'<path d="M37 98h46M44 16q16 12 32 0" stroke="#171513" stroke-width="2.4" fill="none"/><path d="M40 104h40" stroke="#171513" stroke-width="2.4" stroke-dasharray="3 3"/>',
+ lightjacket:'<path d="M60 24v80" stroke="#171513" stroke-width="2.4"/>',
+ jacket:'<path d="M60 24v80M44 62h10" stroke="#171513" stroke-width="2.6"/>',
+ woolcoat:'<path d="M60 26v84M50 20l10 24 10-24" stroke="#171513" stroke-width="2.4" fill="none"/><circle cx="66" cy="60" r="2.5" fill="#171513"/><circle cx="66" cy="76" r="2.5" fill="#171513"/>',
+ puffer:'<path d="M32 36h56M33 52h54M35 68h50M35 84h50M60 18v92" stroke="#171513" stroke-width="2.2" fill="none"/>',
+ raincoat:'<path d="M60 34v76M48 28q12 10 24 0" stroke="#171513" stroke-width="2.4" fill="none"/>',
+ overshirt:'<path d="M60 24v80" stroke="#171513" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>',
+ pants:'<path d="M60 14v34" stroke="#171513" stroke-width="2"/>',
+ sneakers:'<path d="M40 60l6 6m4-8 6 6m4-4 6 6" stroke="#171513" stroke-width="2.4"/>',
+ umbrella:'<path d="M36 60q4-30 24-44m24 44q-4-30-24-44" stroke="#171513" stroke-width="2.2" fill="none"/>',
+ beanie:'<path d="M30 80v8M42 80v8M54 80v8M66 80v8M78 80v8M90 80v8" stroke="#171513" stroke-width="2"/>',
+ sunscreen:'<path d="M42 58h36M42 72h28" stroke="#171513" stroke-width="3"/>',
+ water:'<path d="M34 50h52M34 86h52" stroke="#171513" stroke-width="2.4"/>',
+ mask:'<path d="M24 56h72M24 66h72" stroke="#171513" stroke-width="2" opacity=".5"/>',
+ rainboots:'<path d="M28 86h76" stroke="#171513" stroke-width="2.4"/>',
+};
+function art(id){const it=ITEM[id],p=P[id]||P.tee;return '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="'+it.c+'" stroke="#171513" stroke-width="2.4" stroke-linejoin="round">'+p+'</g><g fill="url(#ht)" opacity=".28">'+p+'</g>'+(DETAIL[id]||"")+'</svg>'}
+
+/* ---------------- the report ---------------- */
+function word(f){return f<20?"bitter":f<33?"freezing":f<46?"cold":f<56?"chilly":f<66?"cool":f<76?"mild":f<86?"warm":f<93?"hot":"scorching"}
+function indoorFor(wx){
+  const mean=(wx.high+wx.low)/2;
+  if(mean<50)return{t:75,why:"Heat is on everywhere and buildings tend to overheat: think 73–78° in class, on the train and in stores."};
+  if(mean<60)return{t:72,why:"Some buildings still heat, some don't, so expect around 70–74° inside."};
+  if(mean<76)return{t:71,why:"Heat and A/C are mostly off, so inside is close to comfortable, around 69–73°."};
+  if(mean<84)return{t:71,why:"A/C is on, so inside sits around 68–73°, and some rooms feel cold."};
+  return{t:69,why:"A/C is working hard: 66–72° inside, a real jump from the street."};
+}
+function build(wx,plan){
+  const L=learned(),st=S.settings,{H,dew}=hourly(wx);
+  const leave=hm(st.leave)??8.5,back=hm(st.back)??18,mins=num(st.mins)??10,mode=st.mode;
+  const commuting=mode!=="none";
+  const at=h=>H[Math.round(clamp(h,0,23))];
+  const outFactor=mins<=5?4:mins>=25?-2:0;               // brief exposure → can dress lighter
+  const bikeF=mode==="bike"?-4:0;
+  const eff=h=>at(h).f-L.out+outFactor+bikeF;
+  const dayHours=commuting?[leave,back]:[10,13,16];
+  const worst=Math.min(...dayHours.map(eff)),warm=Math.max(...[12,13,14,15].map(h=>at(h).f-L.out));
+  const indoor=indoorFor(wx),effIn=indoor.t-L.inn;
+  const rainy=wx.cond==="rain"||wx.cond==="storm";
+  const snow=wx.cond==="snow"||(wx.pop>=50&&wx.high<=34);
+  const thr=L.umbrella;
+  const popAt=h=>at(h).pop;
+  const rainCommute=commuting?Math.max(popAt(leave),popAt(back)):Math.max(...[10,13,16].map(popAt));
+  const rainAny=Math.max(...H.slice(7,22).map(x=>x.pop));
+  const needRain=rainCommute>=thr||rainy&&rainAny>=thr;
+  const gust=wx.gust??(wx.wind!=null?wx.wind*1.4:0);
+  const uv=wx.uv??0,aqi=wx.aqi;
+  const hiF=Math.max(...H.map(x=>x.f));
+  const act=plan.act,actH=hm(plan.actTime)??18.5;
+  const wear=[],bring=[];const add=(arr,id,why,opt)=>arr.push({id,why,opt});
+
+  /* base layer: dressed for INSIDE, since that's where most hours go */
+  let base;
+  if(warm>=82&&effIn>=70)base="tank";else if(effIn>=73||warm>=74)base="tee";else if(effIn>=68)base="longsleeve";else base="sweater";
+  const baseWhy={tank:"it's hot out; keep it light",tee:effIn>=73&&worst<60?"inside runs warm, so start light":"right for the day",longsleeve:"inside is mild; a thin layer is plenty",sweater:"inside stays cool today"}[base];
+  /* outer layer: dressed for the coldest time you're OUTSIDE */
+  let outer=null,outerWhy="";
+  if(worst<24){outer="puffer";outerWhy="for the bitter cold outside; take it off inside"}
+  else if(worst<36){outer="puffer";outerWhy="warmth for the "+(commuting?"commute":"cold")+"; it comes off inside"}
+  else if(worst<47){outer="woolcoat";outerWhy="a warm coat beats a sweater: it comes off inside, a sweater doesn't"}
+  else if(worst<57){outer="jacket";outerWhy="for the "+word(worst)+" "+(commuting?"commute":"hours outside")}
+  else if(worst<65){outer="lightjacket";outerWhy="just enough for "+(eff(back)<eff(leave)?"the evening":"the morning")}
+  else if(worst<72){outer="overshirt";outerWhy="optional, for when it cools off"}
+  if(needRain&&(!outer||["overshirt","lightjacket"].includes(outer))&&worst>=45&&worst<70){outer="raincoat";outerWhy="light and keeps the rain off"}
+  if(outer)add(wear,outer,outerWhy,outer==="overshirt");
+  if(base==="sweater"&&outer&&["woolcoat","puffer"].includes(outer))base="longsleeve";
+  wear.unshift({id:base,why:base==="longsleeve"&&worst<47?"a thin layer, since inside runs warm":baseWhy});
+  /* bottoms + shoes */
+  const midday=Math.max(eff(13),eff(15));
+  add(wear,midday>=77&&worst>=66?"shorts":"pants",midday>=77&&worst>=66?"it stays warm all day":worst<36?"jeans or something heavy":"");
+  if(worst<24)add(wear,"thermals","under your pants; you'll want them outside");
+  if(snow)add(wear,"snowboots","snow or slush underfoot");
+  else if(needRain&&(wx.amt??(wx.pop>=60?.2:0))>=(worst>=70?.5:.15))add(wear,"rainboots","puddles; sneakers will soak through");
+  else if(worst<36)add(wear,"boots","warmer than sneakers in the cold");
+  else if(worst>=74&&!needRain)add(wear,"sandals","it's warm enough");
+  else add(wear,"sneakers","");
+  /* things to bring */
+  if(needRain&&!(gust>=28&&outer==="raincoat")){
+    add(bring,"umbrella",gust>=28?"a sturdy one; gusts of "+W(gust)+" flip cheap ones":"rain chance hits "+Math.round(rainCommute>=thr?rainCommute:rainAny)+"%"+(rainCommute>=thr&&commuting?" on your commute":""));
+  }
+  if(worst<40||(worst<46&&gust>=20))add(bring,"scarf",gust>=20?"wind gets in at the neck":"keeps the cold off your neck");
+  if(worst<36&&!bring.some(b=>b.id==="beanie"))add(bring,"beanie","you lose a lot of heat through your head");
+  if(worst<36||(mode==="bike"&&worst<50))add(bring,"gloves",mode==="bike"?"hands freeze first on a bike":"for the cold");
+  const sunny=["clear","partly"].includes(wx.cond);
+  if(sunny&&uv>=3||uv>=6&&!rainy)add(bring,"sunglasses","bright sun"+(uv>=3?", UV "+uv:""));
+  if(uv>=6||(uv>=3&&(act==="out"||act==="feet")))add(bring,"sunscreen","UV "+uv+": unprotected skin burns in about "+burnMin(uv)+" minutes");
+  if(uv>=8||(act==="out"&&uv>=6))add(bring,"cap","shade for your face");
+  if(hiF>=86||act==="out"||act==="gym"&&hiF>=80)add(bring,"water",hiF>=86?"it feels like "+T(hiF)+"; drink before you're thirsty":"for the workout");
+  if(aqi!=null&&aqi>150||wx.aq&&wx.aq.index>100)add(bring,"mask","air quality is unhealthy");
+  if(base!=="sweater"&&effIn<69&&warm>=74)add(bring,"overshirt","A/C indoors will feel cold");
+
+  /* the headline: the outfit, in one line */
+  const nm=id=>ITEM[id].n.toLowerCase();
+  let head;
+  if(outer&&outer!=="overshirt")head='<mark>'+cap1(nm(outer))+'</mark> over a '+nm(base)+'.';
+  else if(outer)head=cap1(nm(base))+', <mark>'+nm(outer)+'</mark> for later.';
+  else head='<mark>'+cap1(nm(base))+'</mark> and '+nm(wear.find(w=>["shorts","pants"].includes(w.id)).id).replace(" or skirt","")+'.';
+  head=head.replace(/-/g,"\u2011");
+  const bringIds=bring.map(b=>b.id);
+  if(bringIds.includes("umbrella"))head+=' Bring an umbrella.';
+  else if(bringIds.includes("gloves"))head+=' Gloves too.';
+  else if(bringIds.includes("sunscreen"))head+=' Sunscreen on.';
+  /* the sentence under it: why */
+  const sub=[];
+  const lv=at(leave),bk=at(back);
+  // in words, not numbers: what it will feel like on your skin
+  const feelOf=f=>f<10?"painfully cold: bare skin stings within minutes":f<25?"bitter: your face and fingers ache after a few minutes":f<35?"freezing: your breath fogs and your nose runs":f<45?"properly cold: hands-in-pockets weather":f<55?"chilly and crisp: a good coat feels great":f<65?"cool and fresh: a light layer feels right":f<75?"comfortable: you won't think about the temperature":f<83?"warm: sun on your skin, short-sleeve weather":f<90?"hot: you'll feel it on the walk, shade is welcome":"oppressive: heavy, sweaty air";
+  const ref=commuting?eff(leave):worst;
+  sub.push(cap1(commuting?"when you leave it's "+feelOf(ref):"outside it's "+feelOf(ref))+".");
+  if(commuting){const d=eff(back)-eff(leave),hotDay=eff(back)>=75;
+    if(d>=6)sub.push(hotDay?"Even hotter on the way home.":"Milder on the way home.");else if(d<=-6)sub.push(eff(back)<60?"Colder on the way home, so keep everything with you.":"Cooler and nicer on the way home.")}
+  if(gust>=25)sub.push("Gusty enough to flip an umbrella and cut through thin layers.");
+  if(dew!=null&&dew>=65)sub.push("The air feels heavy and damp.");
+  else if(dew!=null&&dew<30&&worst<50)sub.push("The air is dry: chapped lips, static hair.");
+  if(worst<55&&indoor.t>=73)sub.push("Inside will feel stuffy and warm; you'll want to peel off a layer the moment you walk in.");
+  else if(warm>=78&&indoor.t<=71)sub.push("Inside will feel cold from the A/C.");
+  const rainSpan=spanOf(H,thr);
+  if(rainSpan){const amt=wx.amt??(wx.pop>=60?.3:.05);const kind=amt<.1?"a fine drizzle":amt<.3?"light rain on and off":amt<1?"a steady rain that soaks through shoes":"pouring rain";
+    const hrs=H.slice(6,24).filter(x=>x.pop>=thr).map(x=>x.h),part=h=>h<12?"morning":h<17?"afternoon":"evening";
+    const when=rainSpan==="most of the day"?"Wet most of the day":part(hrs[0])===part(hrs[hrs.length-1])?"Rain this "+part(hrs[0]):"Rain from the "+part(hrs[0])+" into the "+part(hrs[hrs.length-1]);
+    sub.push(when+": "+kind+".")}
+  /* key chips */
+  const chips=[];
+  if(commuting)chips.push({k:"Feels like at "+clock(leave),v:T(lv.f)});
+  chips.push({k:"High / low",v:T(wx.high)+'<em>/ '+T(wx.low)+'</em>'});
+  chips.push({k:"Rain",v:Math.round(rainAny)+"%",e:rainSpan||(rainAny<20?"unlikely":"")});
+  chips.push({k:"Inside",v:"~"+T(indoor.t)});
+
+  /* layer plan */
+  const stops=[];
+  const offIn=outer&&outer!=="overshirt";
+  if(commuting){
+    stops.push({k:leave,when:clock(leave),where:"Heading out",t:lv.f,sm:"feels like",do:(outer?"<b>"+ITEM[outer].n+" on</b>"+(worst<47?", zipped":""):"No jacket needed")+(mode==="subway"?". Unzip on the train; cars are heated to the 70s.":mode==="bike"?". You'll warm up after ten minutes, so start a bit cold.":".")});
+    stops.push({k:leave+1,when:clock(leave+1)+"–"+clock(back),where:"Inside",t:indoor.t,sm:"about",do:offIn?"<b>Coat off.</b> "+(base==="tee"||base==="tank"?"You're in your "+nm(base)+", which is right for "+T(indoor.t)+".":"A "+nm(base)+" is enough.") :indoor.why.split(":")[0]+"."});
+    if(act==="out")stops.push({k:actH,when:clock(actH),where:"Workout outside",t:at(actH).f,sm:"feels like",do:"Dress for <b>"+T(at(actH).f+15)+"</b>: your body adds about 15° once you're moving."});
+    stops.push({k:back,when:clock(back),where:"Heading home",t:bk.f,sm:"feels like",do:bk.f<lv.f-5?"<b>Colder than the morning.</b> Everything back on"+(bringIds.includes("gloves")?", gloves too.":"."):bk.f>lv.f+8?"<b>Warmer than the morning.</b> Carry the "+(outer?nm(outer):"layer")+".":"About like the morning."+(sunsetBefore(wx,back)?" It'll be dark.":"")});
+    stops.sort((a,b)=>a.k-b.k);
+  }else{
+    stops.push({when:"Morning",where:"Outside",t:at(9).f,sm:"feels like",do:outer?"<b>"+ITEM[outer].n+"</b> if you go out.":"Light layers."});
+    stops.push({when:"Afternoon",where:"Outside",t:at(15).f,sm:"feels like",do:at(15).f>at(9).f+8?"<b>Warmest part of the day.</b>":"Not much change."});
+    stops.push({when:"All day",where:"Inside",t:indoor.t,sm:"about",do:indoor.why.split(":")[0]+"."});
+  }
+
+  /* heads-ups: only the ones that matter today */
+  const heads=[];
+  (wx.alerts||[]).slice(0,3).forEach(a=>heads.push({ic:"!",cls:"pk",h:a.title||"Weather alert",p:a.text||""}));
+  if(rainSpan)heads.push({ic:"☂",cls:"bl",h:"Rain "+rainSpan,p:"Highest chance "+Math.round(rainAny)+"%"+(wx.amt!=null?", about "+R(wx.amt)+" ("+rainWord(wx.amt)+")":"")+". "+(commuting&&rainCommute<thr?"Your commute should stay dry, but bring it anyway if you'll step out midday.":"")});
+  if(gust>=25)heads.push({ic:"≋",cls:"bl",h:"Gusty: "+W(gust),p:"Gusts are short bursts stronger than the steady wind. Above about 25 mph umbrellas flip and it bites through thin jackets."+(needRain?" A hood beats an umbrella today.":"")});
+  if(wx.high-wx.low>=15)heads.push({ic:"↕",h:"Big swing: "+dT(wx.high-wx.low),p:"From "+T(wx.low)+" to "+T(wx.high)+". Layers you can take off matter more than one warm piece."});
+  if(worst<55&&indoor.t>=73)heads.push({ic:"♨",cls:"pk",h:"Overheated indoors",p:indoor.why+" That's why the plan puts warmth in the coat, not the shirt."});
+  if(warm>=78&&indoor.t<=71)heads.push({ic:"❄",cls:"bl",h:"A/C shock",p:indoor.why+" Keep a light layer in your bag."});
+  if(mode==="subway"&&hiF>=82)heads.push({ic:"Ⓜ",cls:"pk",h:"Hot platforms",p:"Underground platforms often run hotter than the street in summer, sometimes 90°+. Cars are air-conditioned."});
+  if(commuting&&sunsetBefore(wx,back))heads.push({ic:"☾",h:"Dark by "+clock(back),p:"Sunset is at "+clock(hm(wx.sunset))+". It feels colder after dark, and drivers see you less"+(mode==="bike"?": lights on.":".")});
+  if(wx.low<=33&&(wx.pop>=30||rainy||snow))heads.push({ic:"✱",cls:"bl",h:"Possible ice",p:"Below freezing with moisture around: watch for slick sidewalks and steps, especially early."});
+  if(dew!=null&&dew>=65)heads.push({ic:"≈",cls:"pk",h:dew>=70?"Oppressive humidity":"Muggy",p:"Dew point "+T(dew)+". Sweat won't dry, so you'll feel hotter than the number. Breathable fabrics, not polyester."});
+  if(uv>=8)heads.push({ic:"☀",cls:"pk",h:"Very high UV",p:"UV "+uv+": unprotected skin can burn in about "+burnMin(uv)+" minutes, even when it's cloudy."});
+  if(wx.aq&&wx.aq.index>50)heads.push({ic:"!",cls:"pk",h:"Air quality: "+wx.aq.category,p:wx.aq.statement||"Polluted air today."});
+  if(aqi!=null&&aqi>100)heads.push({ic:"!",cls:"pk",h:"Air quality "+aqi,p:aqi>150?"Unhealthy for everyone. Keep outdoor exercise short.":"Unhealthy for sensitive groups (asthma, heart or lung conditions). Go easier on outdoor workouts."});
+  if(act==="out"){const f=at(actH).f;heads.push({ic:"↗",h:"Your workout",p:"At "+clock(actH)+" it feels like "+T(f)+". Dress for about "+T(f+15)+" and add a layer for after."+(f>=85?" Hot: go early, slow down, drink water.":"")});}
+  if(act==="feet")heads.push({ic:"↗",h:"On your feet all day",p:"Moving around keeps you warmer, so you can go a little lighter than the plan, but keep the outer layer."});
+  if(wx.phrase)heads.push({ic:"“",h:"AccuWeather's summary",p:wx.phrase+"."});
+  if(L.n&&(Math.abs(L.out)>=1||Math.abs(L.inn)>=1))heads.push({ic:"✎",h:"Adjusted for you",p:cap1([runs(L.out,"outside"),runs(L.inn,"inside")].filter(Boolean).join(" and "))+", so I dressed you for that. ("+L.n+" day"+(L.n>1?"s":"")+" of notes.)"});
+
+  /* the numbers, explained */
+  const nowF=H[new Date().getHours()];
+  const m=[];
+  m.push({h:"Temperature vs. feels like",val:T(commuting?lv.f:at(12).f),u:"feels like",
+    scale:{min:0,max:100,v:commuting?lv.f:at(12).f,b:[[32,"#9FB8FF","freezing"],[45,"#C9D7FF","cold"],[60,"#E5ECD9","cool"],[75,"#FFF3A8","nice"],[85,"#FFC27A","warm"],[100,"#FF8FB8","hot"]]},
+    p:"The thermometer says "+T(commuting?lv.t:at(12).t)+(commuting?" at "+clock(leave):" midday")+". "+feelsWhy(commuting?lv:at(12),wx),
+    you:"Your skin feels the second number, so dress for it, not the first."});
+  m.push({h:"Rain chance",val:Math.round(rainAny)+"%",u:"",
+    scale:{min:0,max:100,v:rainAny,b:[[20,"#EEF2F7","unlikely"],[50,"#C9D7FF","maybe"],[80,"#7FA2FF","likely"],[100,"#2F5BEA","near certain"]]},
+    p:Math.round(rainAny)+"% means: on "+Math.round(rainAny/10)+" out of 10 days like this, it rains at least a little somewhere around you. It doesn't say how much or for how long.",
+    you:"I suggest an umbrella from "+Math.round(thr)+"%"+(thr!==40?" (tuned to you)":"")+"."});
+  if(wx.amt!=null)m.push({h:"Rain amount",val:R(wx.amt),u:"",
+    scale:{min:0,max:1.2,v:wx.amt,b:[[.1,"#EEF2F7","drizzle"],[.3,"#C9D7FF","light"],[1,"#7FA2FF","steady"],[1.2,"#2F5BEA","heavy"]]},
+    p:"The total for the whole day, if it rains. "+cap1(rainWord(wx.amt))+".",you:wx.amt>=.3?"Enough for puddles and wet shoes.":"Not much; an umbrella or hood is plenty."});
+  if(wx.wind!=null)m.push({h:"Wind",val:W(wx.wind),u:wx.gust?"gusts "+W(wx.gust):"",
+    scale:{min:0,max:40,v:wx.wind,b:[[8,"#EEF2F7","calm"],[16,"#D9E7DD","breezy"],[25,"#9CCFB2","windy"],[40,"#3E8F63","blustery"]]},
+    p:"The steady speed. Gusts are short bursts on top of it. Wind pulls heat off you, which is why it feels colder than the thermometer"+(wx.low<=50?" today":" in cold weather")+".",
+    you:wx.wind>=16?"Pick a jacket that blocks wind; knit lets it through.":"Not enough to change what you wear."});
+  if(dew!=null)m.push({h:"Humidity, the useful way",val:T(dew),u:"dew point",
+    scale:{min:20,max:80,v:dew,b:[[50,"#F2EADF","dry"],[60,"#E5ECD9","comfy"],[65,"#FFF3A8","sticky"],[70,"#FFC27A","muggy"],[80,"#FF8FB8","oppressive"]]},
+    p:(wx.rh!=null?"Your app says "+Math.round(wx.rh)+"% humidity, but that number changes with temperature all day. ":"")+"The dew point says how much water is actually in the air: under 55° feels dry, over 65° feels muggy.",
+    you:dew<35?"Dry air: lips and skin dry out, and static is worse.":dew>=65?"You'll sweat and it won't dry.":"Comfortable."});
+  if(wx.uv!=null)m.push({h:"UV index",val:String(uv),u:"",
+    scale:{min:0,max:12,v:uv,b:[[3,"#E5ECD9","low"],[6,"#FFF3A8","moderate"],[8,"#FFC27A","high"],[11,"#FF8FB8","very high"],[12,"#C04BD8","extreme"]]},
+    p:"How strong the sunburn-causing rays are at midday. It's about the sun's angle, not the temperature: a cool spring day can have high UV.",
+    you:uv<3?"Nothing to do.":"Unprotected skin burns in about "+burnMin(uv)+" minutes."});
+  if(wx.aq&&aqi==null)m.push({h:"Air quality",val:String(Math.round(wx.aq.index)),u:wx.aq.category,
+    scale:{min:0,max:150,v:wx.aq.index,b:[[20,"#BDE5C8","low"],[50,"#FFF3A8","moderate"],[100,"#FFC27A","high"],[150,"#FF8FB8","very high"]]},
+    p:"Pollution on one scale (AccuWeather uses the Plume index, not the US AQI). Under 20 is clean; over 50 starts to bother people with asthma; over 100 bothers everyone.",
+    you:wx.aq.index<=50?"Fine for anything, including running outside.":"Go easier on outdoor workouts, especially if you have asthma."});
+  if(aqi!=null)m.push({h:"Air quality",val:String(aqi),u:"AQI",
+    scale:{min:0,max:200,v:aqi,b:[[50,"#BDE5C8","good"],[100,"#FFF3A8","moderate"],[150,"#FFC27A","sensitive"],[200,"#FF8FB8","unhealthy"]]},
+    p:"Pollution and smoke on one scale. Under 50 is clean; over 100 starts to affect people with asthma; over 150 affects everyone.",
+    you:aqi<=100?"Fine for anything, including running outside.":"Shorten outdoor workouts."});
+  m.push({h:"Today's range",val:dT(wx.high-wx.low),u:"high minus low",
+    scale:{min:0,max:30,v:wx.high-wx.low,b:[[8,"#EEF2F7","steady"],[15,"#FFF3A8","shifts"],[30,"#FFC27A","big swing"]]},
+    p:"Lows usually come around sunrise and highs mid-afternoon, so "+(commuting?"your commute hits the cooler ends of the day.":"mornings and evenings are the cold ends."),
+    you:wx.high-wx.low>=15?"Layers you can take off.":"One outfit works all day."});
+  if(wx.sunset)m.push({h:"Daylight",val:clock(hm(wx.sunset)),u:"sunset",
+    scale:{min:16,max:21,v:hm(wx.sunset),b:[[17,"#3B4A6B","early"],[19,"#9FB8FF","evening"],[21,"#FFE24A","late"]]},
+    p:"Temperatures drop faster once the sun goes down.",you:commuting&&sunsetBefore(wx,back)?"You'll head home after dark.":"You'll head home in daylight."});
+
+  const nowH=new Date().getHours()+new Date().getMinutes()/60;
+  let bigF,bigLbl;
+  if(wx.now!=null&&(!commuting||nowH>leave+.5)){bigF=wx.feels??at(nowH).f;bigLbl="feels like right now, "+clock(nowH)}
+  else if(commuting){bigF=lv.f;bigLbl="feels like when you leave, "+clock(leave)}
+  else{bigF=at(10).f;bigLbl="feels like this morning"}
+  const acts=activities(wx,H,dew,gust,plan.nextPop);
+  return {acts,wear,bring,head,sub:sub.join(" "),chips,stops,heads,m,L,indoor,bigF,bigLbl,rainAny,rainSpan,outer,base};
+}
+/* ---------------- good day to / not a good day to ---------------- */
+function activities(wx,H,dew,gust,nextPop){
+  const day=H.slice(8,21),eve=H.slice(17,22);
+  const rain=Math.max(...day.map(x=>x.pop)),rainEve=Math.max(...eve.map(x=>x.pop));
+  const fMin=Math.min(...day.map(x=>x.f)),fMax=Math.max(...day.map(x=>x.f));
+  const wind=wx.wind??0,uv=wx.uv??0,c=wx.cond,clearish=c==="clear"||c==="partly";
+  const air=wx.aq?wx.aq.index:wx.aqi!=null?wx.aqi/2:null;           // AccuWeather index; US AQI roughly halves onto it
+  const dirtyAir=air!=null&&air>50,sticky=dew!=null&&dew>=65,dry=dew!=null&&dew<45;
+  const ice=wx.low<=33&&(rain>=30||c==="snow");
+  const out=[];const add=(id,label,good,bad,why)=>{if(good)out.push({id,label,ok:true,why:why[0]});else if(bad)out.push({id,label,ok:false,why:why[1]})};
+  add("air","Open the windows and air out the place",rain<30&&fMax>=50&&fMax<=82&&!dirtyAir&&!sticky,rain>=50||dirtyAir||fMax<40,
+    ["mild and dry, and the air outside is clean",dirtyAir?"the air outside is dirtier than inside today":rain>=50?"rain would blow in":"you'd let all the heat out"]);
+  add("walk","Take a long walk",rain<30&&fMin>=42&&fMax<=84&&gust<30,rain>=60||fMax<30||fMax>=92||ice,
+    ["dry and comfortable most of the day",ice?"sidewalks could be icy":rain>=60?"it'll be wet most of the day":fMax>=92?"it's too hot to enjoy it":"it's bitter out"]);
+  add("run","Go for a run",fMin>=35&&fMax<=72&&rain<40&&!dirtyAir&&!sticky,sticky||dirtyAir||fMax>=85||rain>=70||ice,
+    ["cool air is ideal for running",sticky?"humid: sweat won't cool you":dirtyAir?"polluted air, and you breathe hard when you run":ice?"icy footing":fMax>=85?"too hot to run safely midday":"soaking wet out"]);
+  add("laundry","Hang laundry outside to dry",rain<15&&clearish&&!sticky&&wind>=4&&wind<=20&&fMax>=55,rain>=30||sticky||fMax<45,
+    ["sun, a breeze and dry air",rain>=30?"it might rain on it":sticky?"too humid, it won't dry":"too cold to dry"]);
+  add("bike","Ride a bike",rain<20&&gust<25&&fMin>=45&&fMax<=86,gust>=30||rain>=50||ice||fMax<32,
+    ["calm and dry",gust>=30?"gusts up to "+Math.round(gust)+" mph":ice?"icy roads":rain>=50?"wet roads, low visibility":"freezing on a bike"]);
+  add("picnic","Eat outside or have a picnic",fMin>=62&&fMax<=86&&rain<20&&wind<15,rain>=40||fMax<50||wind>=20,
+    ["warm, dry and not too windy",rain>=40?"rain likely":wind>=20?"napkins will fly":"too cold to sit outside"]);
+  add("park","Sit in the park and read",fMax>=60&&fMax<=82&&rain<20&&uv<8,rain>=50||fMax<45,
+    ["pleasant enough to sit still outside","too "+(rain>=50?"wet":"cold")+" to sit still outside"]);
+  add("sunset","Watch the sunset",clearish&&rainEve<25,c==="rain"||c==="storm"||c==="fog"||rainEve>=50,
+    ["clear-ish skies this evening"+(wx.sunset?", around "+clock(hm(wx.sunset)):""),"clouds and rain will hide it"]);
+  add("photos","Shoot a roll of film at golden hour",clearish&&rainEve<30,false,["low, warm light in the hour before sunset",""]);
+  add("kite","Fly a kite",wind>=10&&wind<=25&&rain<20,false,["steady wind around "+Math.round(wind)+" mph",""]);
+  add("windows","Wash the windows",c==="cloudy"&&rain<20,false,["cloudy and dry: no sun to leave streaks",""]);
+  add("car","Wash the car",rain<20&&(nextPop==null||nextPop<30)&&fMax>=40,rain>=40||(nextPop!=null&&nextPop>=50),
+    ["dry today"+(nextPop!=null?" and tomorrow":""),"rain will undo it"]);
+  add("plants","Water the plants outside",fMax>=75&&rain<20,rain>=60,["hot and dry: they'll be thirsty","the rain will do it for you"]);
+  add("suede","Wear suede or your nice shoes",rain<20&&c!=="snow",rain>=40||c==="snow",["no puddles today","puddles and splashes"]);
+  add("hair","Blow-dry or straighten your hair",dry&&rain<30,sticky||rain>=60,["dry air, it'll hold","humidity means frizz"]);
+  add("sandals","Wear open-toed shoes",fMin>=70&&rain<30,false,["warm all day",""]);
+  add("brisk","Bundle up for a brisk walk",fMax>=28&&fMax<45&&rain<25&&gust<30,false,["cold but dry: it'll wake you up",""]);
+  add("errands","Run errands on foot",rain<40&&fMin>=32&&fMax<=88&&!ice,false,["nothing to dodge out there",""]);
+  add("ferry","Ride the ferry and look at the skyline",clearish&&wind<15&&fMin>=45&&rain<20,false,["clear and calm on the water",""]);
+  add("beach","Go to the beach",fMax>=80&&rain<30&&clearish,false,["hot and sunny",""]);
+  add("stars","Look for stars tonight",clearish&&rainEve<15,false,["clear night ahead",""]);
+  add("noumb","Leave the umbrella at home",rain<10,rain>=40,["essentially no rain","rain chance "+Math.round(rain)+"%"]);
+  add("white","Wear white",false,rain>=50,["","splashing puddles"]);
+  add("book","Stay in with a book",rain>=50||fMax<35,false,["it's that kind of day",""]);
+  add("museum","Spend the day somewhere indoors: a museum, a café, a movie",rain>=60||fMax<32||fMax>=92,false,["a good excuse to stay in",""]);
+  add("bake","Bake or cook something slow",fMax<48||rain>=70,false,["the oven will warm the place up",""]);
+  add("hotdrink","Get a hot drink to go",fMin<45,false,["something warm to hold on the way",""]);
+  add("iced","Get an iced coffee",fMax>=78,false,["it's warm enough",""]);
+  return out;
+}
+function cap1(s){s=String(s);return s.charAt(0).toUpperCase()+s.slice(1)}
+function burnMin(uv){return uv<=2?60:uv<=5?Math.round(60-8*(uv-2)):uv<=7?Math.round(30-5*(uv-5)):Math.max(10,Math.round(20-3*(uv-7)))}
+function rainWord(a){return a<.1?"a drizzle at most":a<.3?"light rain":a<1?"a steady, soaking rain":"heavy rain"}
+function sunsetBefore(wx,back){const s=hm(wx.sunset);return s!=null&&back>s}
+function spanOf(H,thr){const on=H.slice(6,24).filter(x=>x.pop>=thr).map(x=>x.h);if(!on.length)return"";const a=on[0],b=on[on.length-1];if(a<=7&&b>=21)return"most of the day";if(b-a<=1)return"around "+clock(a);return"from about "+clock(a)+" to "+clock(b+1)}
+function feelsWhy(x,wx){const d=x.f-x.t;if(d<=-3)return"Wind makes it feel "+dT(-d)+" colder ("+T(x.f)+").";if(d>=3)return"Humidity makes it feel "+dT(d)+" hotter ("+T(x.f)+"): sweat can't dry and cool you.";return"Today the two are about the same."}
+
+
+/* ---------------- the figure: clothes as they're worn ---------------- */
+const BODY='<g fill="#E9D8BC" stroke="#171513" stroke-width="2.4" stroke-linejoin="round">'+
+ '<path d="M106 120 L86 128 L60 292 L78 298 L104 176 Z"/><path d="M194 120 L214 128 L240 292 L222 298 L196 176 Z"/>'+
+ '<path d="M106 286 L150 286 L148 504 L120 504 Z"/><path d="M150 286 L194 286 L180 504 L152 504 Z"/>'+
+ '<path d="M118 500 L148 500 L148 520 L110 520 Q106 510 118 500 Z"/><path d="M152 500 L182 500 Q194 510 190 520 L152 520 Z"/>'+
+ '<path d="M104 118 Q150 108 196 118 L192 250 L196 290 L104 290 L108 250 Z"/>'+
+ '<rect x="140" y="90" width="20" height="26"/><ellipse cx="150" cy="58" rx="32" ry="38"/>'+
+ '<circle cx="68" cy="302" r="12"/><circle cx="232" cy="302" r="12"/></g>';
+const G={ // garment shapes fitted to the figure (viewBox 0 0 300 560)
+ tank:{z:"top",d:'<path d="M118 114 L132 114 Q150 140 168 114 L182 114 Q184 150 196 170 L194 284 L106 284 L104 170 Q116 150 118 114 Z"/>'},
+ tee:{z:"top",d:'<path d="M104 116 L134 106 Q150 122 166 106 L196 116 L216 124 L228 170 L198 178 L194 284 L106 284 L102 178 L72 170 L84 124 Z"/>'},
+ longsleeve:{z:"top",d:'<path d="M104 116 L134 106 Q150 122 166 106 L196 116 L216 124 L244 290 L220 296 L198 182 L194 284 L106 284 L102 182 L80 296 L56 290 L84 124 Z"/>'},
+ sweater:{z:"top",d:'<path d="M102 116 L134 104 Q150 118 166 104 L198 116 L218 124 L246 290 L220 298 L200 182 L196 286 L104 286 L100 182 L80 298 L54 290 L82 124 Z"/>',x:'<path d="M106 276 H194 M58 282 L80 287 M242 282 L220 287" stroke="#171513" stroke-width="2" stroke-dasharray="3 3" fill="none"/>'},
+ overshirt:{z:"top",o:1,d:'<path d="M100 114 L136 104 L150 150 L164 104 L200 114 L220 124 L248 292 L222 298 L200 184 L198 292 L156 292 L150 160 L144 292 L102 292 L100 184 L78 298 L52 292 L80 124 Z"/>'},
+ lightjacket:{z:"top",o:1,d:'<path d="M100 112 L136 102 L150 140 L164 102 L200 112 L222 124 L250 292 L222 300 L202 186 L200 296 L100 296 L98 186 L78 300 L50 292 L78 124 Z"/>',x:'<path d="M150 140 V296" stroke="#171513" stroke-width="2.4"/>'},
+ jacket:{z:"top",o:1,d:'<path d="M98 110 L136 100 L150 150 L164 100 L202 110 L224 124 L252 292 L224 302 L204 188 L204 304 L96 304 L96 188 L76 302 L48 292 L76 124 Z"/>',x:'<path d="M150 150 V304 M112 240 h16 M172 240 h16" stroke="#171513" stroke-width="2.4"/>'},
+ woolcoat:{z:"top",o:1,d:'<path d="M98 110 L136 100 L150 196 L164 100 L202 110 L224 124 L252 294 L224 302 L204 190 L210 388 L90 388 L96 190 L76 302 L48 294 L76 124 Z"/>',x:'<path d="M150 196 V388" stroke="#171513" stroke-width="2.4"/><circle cx="160" cy="226" r="3" fill="#171513"/><circle cx="160" cy="262" r="3" fill="#171513"/><circle cx="160" cy="298" r="3" fill="#171513"/>'},
+ puffer:{z:"top",o:1,d:'<path d="M96 108 Q150 92 204 108 L230 124 L258 290 Q244 306 222 300 L206 196 L210 312 Q150 326 90 312 L94 196 L78 300 Q56 306 42 290 L70 124 Z"/>',x:'<path d="M96 150 H204 M94 190 H206 M94 230 H208 M92 270 H208 M150 104 V318 M64 180 L82 186 M60 230 L80 236 M236 180 L218 186 M240 230 L220 236" stroke="#171513" stroke-width="2.2" fill="none"/>'},
+ raincoat:{z:"top",o:1,d:'<path fill-rule="evenodd" d="M108 80 Q106 14 150 12 Q194 14 192 80 L200 112 L222 124 L250 292 L222 300 L202 186 L204 334 L96 334 L98 186 L78 300 L50 292 L78 124 L100 112 Z M150 30 a26 32 0 1 0 0.1 0 Z"/>',x:'<path d="M150 96 V334" stroke="#171513" stroke-width="2.4"/>'},
+ thermals:{z:"legs",d:'<path d="M106 282 L194 282 L182 506 L154 506 L150 330 L146 506 L118 506 Z"/>'},
+ pants:{z:"legs",o:1,d:'<path d="M104 282 L196 282 L186 506 L154 506 L150 328 L146 506 L114 506 Z"/>',x:'<path d="M150 284 V326" stroke="#171513" stroke-width="2"/>'},
+ shorts:{z:"legs",o:1,d:'<path d="M104 282 L196 282 L202 372 L156 376 L150 330 L144 376 L98 372 Z"/>'},
+ sneakers:{z:"feet",d:'<path d="M114 498 L148 498 L150 522 L104 522 Q100 508 114 498 Z"/><path d="M152 498 L186 498 Q200 508 196 522 L150 522 Z"/>',x:'<path d="M104 516 H150 M150 516 H196" stroke="#171513" stroke-width="2"/>'},
+ boots:{z:"feet",d:'<path d="M116 452 L148 452 L150 524 L102 524 Q98 506 116 500 Z"/><path d="M152 452 L184 452 L184 500 Q202 506 198 524 L150 524 Z"/>'},
+ rainboots:{z:"feet",d:'<path d="M114 432 L150 432 L150 524 L100 524 Q96 506 114 500 Z"/><path d="M150 432 L186 432 L186 500 Q204 506 200 524 L150 524 Z"/>',x:'<path d="M114 444 H150 M150 444 H186" stroke="#171513" stroke-width="2"/>'},
+ snowboots:{z:"feet",d:'<path d="M110 440 L152 440 L152 526 L98 526 Q94 506 112 498 Z"/><path d="M148 440 L190 440 L188 498 Q206 506 202 526 L148 526 Z"/>',x:'<path d="M110 452 H152 M148 452 H190" stroke="#171513" stroke-width="5" stroke-dasharray="2 3"/>'},
+ sandals:{z:"feet",d:'<path d="M104 514 L150 514 L150 524 L102 524 Z"/><path d="M150 514 L198 514 L198 524 L150 524 Z"/><path d="M116 502 L146 502 L146 509 L116 509 Z"/><path d="M154 502 L184 502 L184 509 L154 509 Z"/>'},
+ beanie:{z:"head",d:'<path d="M116 52 Q116 14 150 14 Q184 14 184 52 Z"/><path d="M112 44 L188 44 L188 58 L112 58 Z"/><circle cx="150" cy="12" r="9"/>'},
+ cap:{z:"head",d:'<path d="M118 44 Q120 18 150 18 Q180 18 182 44 Z"/><path d="M150 40 L208 44 Q198 54 150 50 Z"/>'},
+ sunglasses:{z:"face",d:'<path d="M122 48 L147 48 Q147 64 136 64 Q122 64 122 50 Z"/><path d="M153 48 L178 48 Q178 64 164 64 Q153 64 153 50 Z"/><path d="M146 49 H154 V53 H146 Z"/>'},
+ mask:{z:"face",d:'<path d="M124 68 Q150 62 176 68 L174 86 Q150 98 126 86 Z"/>'},
+ scarf:{z:"neck",d:'<path d="M116 100 Q150 122 184 100 L188 118 Q150 142 112 118 Z"/><path d="M162 120 L178 118 L184 198 L164 202 Z"/>'},
+ gloves:{z:"hands",d:'<path d="M54 288 L82 292 L84 312 Q70 326 54 314 Z"/><path d="M246 288 L218 292 L216 312 Q230 326 246 314 Z"/>'},
+ umbrella:{z:"held",d:'<path d="M242 330 L264 336 L252 512 Z"/>',x:'<path d="M236 304 Q228 292 236 286 Q246 280 249 292 L251 340 M252 510 L253 530" stroke="#171513" stroke-width="4" fill="none" stroke-linecap="round"/>'},
+};
+const ORDER_Z=["held","legs","feet","top","neck","hands","face","head"];
+function dollModel(R0){
+  const worn=[],bag=[];
+  R0.wear.forEach(w=>{if(G[w.id])worn.push(w)});
+  R0.bring.forEach(b=>{if(G[b.id]&&b.id!=="overshirt")worn.push({...b,brought:1});else bag.push(b)});
+  return{worn,bag};
+}
+function dollSVG(worn){
+  // draw by zone so outer layers sit on top; within a zone keep base before outer
+  const zIdx=w=>ORDER_Z.indexOf(G[w.id].z)*10+(G[w.id].o?5:0);
+  const sorted=[...worn].sort((a,b)=>zIdx(a)-zIdx(b));
+  const layers={};worn.forEach(w=>{const z=G[w.id].z;(layers[z]=layers[z]||[]).push(w.id)});
+  const lift=id=>{const z=G[id].z;return(z==="top"||z==="legs")&&G[id].o&&layers[z].length>1?" lift-"+z:""};
+  const outerOf=z=>{const w=worn.find(v=>G[v.id].z===z&&G[v.id].o);return w&&layers[z].length>1?w.id:null};
+  const HIT={top:[44,100,212,outerOf("top")&&G[outerOf("top")]&&/woolcoat|raincoat/.test(outerOf("top"))?296:206],legs:[96,286,108,214]};
+  const done={};
+  const hits=sorted.map(w=>{const z=G[w.id].z;
+    if((z==="top"||z==="legs")&&outerOf(z)){if(done[z])return"";done[z]=1;const [x,y,W,H]=HIT[z];const inner=worn.find(v=>G[v.id].z===z&&!G[v.id].o);return '<rect class="hit" data-peek="'+z+'" data-id="'+(inner?inner.id:outerOf(z))+'" data-outer="'+outerOf(z)+'" x="'+x+'" y="'+y+'" width="'+W+'" height="'+H+'"/>'}
+    return '<g class="hit" data-id="'+w.id+'" stroke-width="10">'+G[w.id].d+'</g>'}).join("");
+  return '<svg viewBox="0 0 300 560" role="img" aria-label="The outfit, as worn">'+BODY+
+    sorted.map(w=>'<g class="g'+lift(w.id)+'" data-id="'+w.id+'" data-z="'+G[w.id].z+'" tabindex="-1"><g fill="'+ITEM[w.id].c+'" stroke="#171513" stroke-width="2.4" stroke-linejoin="round">'+G[w.id].d+'</g>'+(ITEM[w.id].p?'<g fill="url(#'+ITEM[w.id].p+')" stroke="none">'+G[w.id].d+'</g><g fill="none" stroke="#171513" stroke-width="2.4" stroke-linejoin="round">'+G[w.id].d+'</g>':"")+'<g fill="url(#ht)" opacity=".16" style="pointer-events:none">'+G[w.id].d+'</g>'+(G[w.id].x?(/#2E2C2A|#3255A4|#1F8A8A/.test(ITEM[w.id].c)?G[w.id].x.replace(/#171513/g,"#F7F3EA"):G[w.id].x):"")+'</g>').join("")+hits+'</svg>';
+}
+// where each label points: [x, y in the figure's 300×560 drawing, side]
+function anchorFor(id,worn){
+  const z=G[id].z,hasOuter=z=>worn.some(w=>G[w.id].z===z&&G[w.id].o);
+  if(z==="head")return[132,34,"l"];
+  if(z==="face")return id==="mask"?[172,80,"r"]:[172,56,"r"];
+  if(z==="neck")return[180,112,"r"];
+  if(z==="top")return G[id].o?[92,220,"l"]:hasOuter("top")?[146,150,"l"]:[104,200,"l"];
+  if(z==="hands")return[240,306,"r"];
+  if(z==="held")return[256,430,"r"];
+  if(z==="legs"){if(id==="shorts")return[110,340,"l"];if(id==="thermals")return[122,470,"l"];return[116,405,"l"]}
+  if(z==="feet")return[188,510,"r"];
+  return[150,280,"l"];
+}
+function layoutTags(root){
+  const st=root.querySelector(".dollStage");if(!st)return;
+  const svg=st.querySelector(".doll svg"),lines=st.querySelector(".leaders");
+  const sr=st.getBoundingClientRect(),dr=svg.getBoundingClientRect(),k=dr.width/300;
+  const lc=st.querySelector(".lcol").getBoundingClientRect(),rc=st.querySelector(".rcol").getBoundingClientRect();
+  const pt=t=>({x:dr.left-sr.left+(+t.dataset.ax)*k,y:dr.top-sr.top+(+t.dataset.ay)*k});
+  let path="";
+  ["l","r"].forEach(side=>{
+    const col=side==="l"?lc:rc,tags=[...st.querySelectorAll(".tag.side-"+side)].sort((a,b)=>a.dataset.ay-b.dataset.ay);
+    let bottom=0;
+    tags.forEach(t=>{t.style.left=(col.left-sr.left)+"px";t.style.width=col.width+"px";
+      const p=pt(t),h=t.offsetHeight;let top=Math.max(bottom,p.y-14);t.style.top=top+"px";bottom=top+h+12;t._p=p});
+    // if the column ran past the bottom, push everything back up
+    const over=bottom-12-st.clientHeight;if(over>0)tags.forEach(t=>{t.style.top=(parseFloat(t.style.top)-over)+"px"});
+    tags.forEach(t=>{const p=t._p,y=parseFloat(t.style.top)+14,x=side==="l"?col.left-sr.left+col.width+4:col.left-sr.left-4,elbow=side==="l"?x+10:x-10;
+      path+='<path d="M'+x+' '+y+' H'+elbow+' L'+p.x+' '+p.y+'"/><circle cx="'+p.x+'" cy="'+p.y+'" r="3"/>'});
+  });
+  lines.setAttribute("viewBox","0 0 "+st.clientWidth+" "+st.clientHeight);lines.innerHTML=path;
+}
+let tagRO=null;
+function wireDoll(root){
+  layoutTags(root);requestAnimationFrame(()=>layoutTags(root));
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>layoutTags(root));
+  if(tagRO)tagRO.disconnect();const stg=root.querySelector(".dollStage");if(stg&&window.ResizeObserver){tagRO=new ResizeObserver(()=>layoutTags(root));tagRO.observe(stg)}
+  const doll=root.querySelector(".doll");if(!doll)return;
+  const lists=root.querySelectorAll(".tag");
+  let t=null,cur=null,peek=null,pinned=false;
+  const apply=()=>{doll.classList.toggle("peek-top",peek==="top");doll.classList.toggle("peek-legs",peek==="legs");
+    doll.querySelectorAll(".g").forEach(g=>g.classList.toggle("hi",g.dataset.id===cur));lists.forEach(b=>b.classList.toggle("hi",b.dataset.id===cur))};
+  const set=(id,pk,ms)=>{clearTimeout(t);t=setTimeout(()=>{cur=id;peek=pk;apply()},ms)};
+  const reset=ms=>{if(pinned)return;set(null,null,ms)};
+  // every piece has its own invisible target that never moves, so nothing jitters
+  doll.querySelectorAll(".hit").forEach(h=>{
+    h.addEventListener("pointerenter",()=>{pinned=false;set(h.dataset.id,h.dataset.peek||null,60)});
+    h.addEventListener("pointerleave",()=>reset(120));
+    h.addEventListener("click",e=>{e.stopPropagation();if(h.dataset.peek){pinned=!(pinned&&peek===h.dataset.peek);clearTimeout(t);cur=pinned?h.dataset.id:null;peek=pinned?h.dataset.peek:null;apply()}})});
+  doll.addEventListener("pointerleave",()=>{pinned=false;clearTimeout(t);cur=null;peek=null;apply()});
+  // the lists point at the piece on the figure
+  // a label for a layer that sits under something opens that zone, the same as hovering the coat
+  const peekFor=id=>{const h=doll.querySelector('.hit[data-peek][data-id="'+id+'"]');return h?h.dataset.peek:null};
+  lists.forEach(b=>{
+    b.addEventListener("pointerenter",()=>set(b.dataset.id,peekFor(b.dataset.id),60));
+    b.addEventListener("pointerleave",()=>reset(120));
+    b.addEventListener("focus",()=>set(b.dataset.id,peekFor(b.dataset.id),0));
+    b.addEventListener("blur",()=>reset(0));
+    b.addEventListener("click",()=>{const z=peekFor(b.dataset.id);if(z){clearTimeout(t);cur=b.dataset.id;peek=peek===z?null:z;apply()}})});
+}
+const WXI={
+ sun:'<circle cx="50" cy="50" r="20" fill="#FFE24A"/><g stroke="#171513" stroke-width="5" stroke-linecap="round"><path d="M50 12v12M50 76v12M12 50h12M76 50h12M23 23l8 8M69 69l8 8M77 23l-8 8M31 69l-8 8"/></g>',
+ cloud:'<path d="M26 74 Q8 74 10 58 Q12 44 28 46 Q32 26 54 28 Q72 28 76 46 Q92 46 90 60 Q88 74 72 74 Z" fill="#F3F1EC"/>',
+};
+function wxIcon(c){
+  const cl=WXI.cloud.replace('fill="#F3F1EC"','fill="#F3F1EC" stroke="#171513" stroke-width="3"');
+  const sun='<g stroke="#171513" stroke-width="3">'+WXI.sun+'</g>';
+  const drops='<g stroke="#2F5BEA" stroke-width="5" stroke-linecap="round"><path d="M34 82l-4 10M52 82l-4 10M70 82l-4 10"/></g>';
+  const map={clear:sun,partly:'<g transform="translate(18 -14) scale(.8)">'+sun+'</g>'+cl,cloudy:cl,rain:cl+drops,
+    storm:cl+'<path d="M54 70 L42 88 H54 L46 100 L66 80 H54 L60 70 Z" fill="#FFE24A" stroke="#171513" stroke-width="2.5"/>',
+    snow:cl+'<g fill="#9FB8FF" stroke="#171513" stroke-width="2"><circle cx="34" cy="88" r="5"/><circle cx="54" cy="92" r="5"/><circle cx="72" cy="86" r="5"/></g>',
+    fog:'<g stroke="#171513" stroke-width="6" stroke-linecap="round"><path d="M14 40h72M22 56h60M14 72h72"/></g>'};
+  return '<svg viewBox="6 8 90 90" aria-hidden="true">'+(map[c]||cl)+'</svg>'}
+const COND={clear:"Sunny",partly:"Partly cloudy",cloudy:"Cloudy",rain:"Rain",storm:"Rain & thunderstorms",snow:"Snow",fog:"Fog"};
+/* ---------------- render ---------------- */
+function renderIssue(){
+  const place=S.settings.locName||S.settings.loc||"Your city";
+  const d=new Date(),start=new Date(d.getFullYear(),0,0),doy=Math.floor((d-start)/864e5);
+  $("issue").innerHTML="Issue No. "+doy+" · <b>"+d.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})+"</b> · "+esc(place);
+}
+function cutHTML(x,i){const r=[-4,3,-2,4,-3,2,-5,3][i%8];
+  return '<div class="cut'+(x.opt?" opt":"")+'" style="--r:'+r+'deg"><span class="pic">'+art(x.id)+'</span><br><span class="name">'+esc(ITEM[x.id].n)+(x.opt?" · optional":"")+'</span>'+(x.why?'<span class="why">'+esc(x.why)+'</span>':"")+'</div>'}
+function scaleHTML(s){
+  let prev=s.min,active=s.b[s.b.length-1][2];const bands=s.b.map(([to,c,l])=>{const w=(to-prev)/(s.max-s.min);if(s.v>=prev&&s.v<to&&active===s.b[s.b.length-1][2])active=l;if(s.v<s.min)active=s.b[0][2];prev=to;return{w,c}});
+  const pos=clamp((s.v-s.min)/(s.max-s.min),0,1)*100,lp=clamp(pos,9,91);
+  return '<div class="scale" role="img" aria-label="'+esc(active)+'"><div class="bands">'+bands.map(b=>'<span style="flex:'+b.w+';background:'+b.c+'"></span>').join("")+'</div><div class="marker" style="left:'+pos+'%"></div><div class="mlab" style="left:'+lp+'%">'+esc(active)+'</div></div>'}
+function renderReport(){
+  const r=$("report");
+  $("loadCard").hidden=true;
+  if(!current){r.hidden=true;
+    if(accuState==="loading"){$("inputCard").hidden=true;$("loadCard").hidden=false;$("loadCard").querySelector(".hint").textContent="From Open-Meteo";$("loadText").textContent="Getting the forecast for "+(S.settings.locName||S.settings.loc||"you")+"…";return}
+    $("inputCard").hidden=false;
+    if(accuState==="error"&&$("inStart").hidden===false){const st=$("readStatus");st.className="status err";st.innerHTML="Couldn't get the forecast. <button class=\"link\" id=\"retryAccu\">Try again</button> or add the numbers yourself.<br><small style=\"color:var(--muted)\">Details: "+esc(accuErr||"no answer")+"</small>";$("retryAccu").onclick=loadAccu}
+    return}
+  const R0=build(current.wx,current.plan);
+  $("inputCard").hidden=true;r.hidden=false;
+  const live=current.src==="AccuWeather"&&!isExample;
+  const isToday=!current.key||current.key===todayKey();
+  const st=S.settings,modeName={subway:"subway",walk:"walking",bus:"bus",bike:"bike",car:"car",none:"no commute"}[st.mode];
+  const actName={desk:"mostly sitting",feet:"on your feet",out:"workout outside at "+clock(hm(current.plan.actTime)||18.5),gym:"workout inside"}[current.plan.act];
+  const fbDone=!isExample&&S.days[todayKey()]&&S.days[todayKey()].fb;
+  r.innerHTML=
+   (isExample?'<div class="exampleNote">Example day: '+esc(current.label)+' · <button class="link" style="color:var(--yellow)" id="exitEx">Add today\'s real forecast</button></div>':"")+
+   (()=>{
+     const dk=current.key||todayKey(),[yy,mm,dd]=dk.split("-").map(Number),dt=new Date(yy,mm-1,dd);
+     const tabs=live?'<div class="dayTabs" role="group" aria-label="Which day">'+[0,1].map(i=>{const d=accu.daily.dailyForecast[i];return d?'<button type="button" data-day="'+i+'" aria-pressed="'+(view===i)+'">'+(i?"Tomorrow":"Today")+'</button>':""}).join("")+'</div>':"";
+     const {worn,bag}=dollModel(R0);
+     const nowH=new Date().getHours()+new Date().getMinutes()/60;
+     const wornByBody=[...worn].sort((a,b)=>["head","face","neck","top","hands","held","legs","feet"].indexOf(G[a.id].z)-["head","face","neck","top","hands","held","legs","feet"].indexOf(G[b.id].z)||(G[b.id].o?1:0)-(G[a.id].o?1:0));
+     const under=id=>{const z=G[id].z;if(G[id].o){const inner=worn.find(w=>G[w.id].z===z&&!G[w.id].o);return inner?'<div class="under">over the '+esc(ITEM[inner.id].n.toLowerCase())+'</div>':""}
+       const outer=worn.find(w=>G[w.id].z===z&&G[w.id].o);return outer?'<div class="under">under the '+esc(ITEM[outer.id].n.toLowerCase())+'</div>':""};
+     const li=w=>'<li><button type="button" data-id="'+w.id+'"><b>'+esc(ITEM[w.id].n)+(w.opt?" (optional)":"")+'</b>'+(w.why?'<span>'+esc(w.why)+'</span>':"")+under(w.id)+'</button></li>';
+     const wearList=wornByBody.filter(w=>!w.brought),addList=wornByBody.filter(w=>w.brought);
+     const half=Math.ceil(wearList.length/2);
+     return '<section class="top2" aria-label="'+(isToday?"Today":"Tomorrow")+'">'+
+      '<div>'+
+        '<div class="dateBar"><h1 class="dateH">'+esc(dt.toLocaleDateString(undefined,{weekday:"long"}))+'</h1>'+
+        '<p class="dateSub">'+esc(dt.toLocaleDateString(undefined,{month:"short",day:"numeric"}))+'<br><button class="link placeBtn" id="placeBtn" title="Change place, commute and units">'+esc(S.settings.locName||S.settings.loc||"Set your place")+'</button></p>'+tabs.replace('class="dayTabs"','class="dayTabs sm"')+'</div>'+
+        '<div class="wxBlock"><div class="wxMain"><div class="bigT">'+T(R0.bigF)+'</div><div class="wxIcon">'+wxIcon(current.wx.cond)+'</div></div><div class="bigL">'+esc(R0.bigLbl)+'</div>'+
+          '<div class="cond">'+esc(current.wx.short||COND[current.wx.cond]||"")+'</div>'+
+          '<p class="hl">High <b>'+T(current.wx.high)+'</b> · Low <b>'+T(current.wx.low)+'</b> · Rain <b>'+Math.round(R0.rainAny)+'%</b>'+(R0.rainSpan?' '+esc(R0.rainSpan):"")+'</p>'+
+          '<p class="desc">'+esc(R0.sub)+'</p>'+
+          (()=>{const live=isToday&&!isExample,ends=R0.stops.map((x,i)=>x.where==="Inside"?[x.k-.5,(R0.stops[i+1]||{k:24}).k-.5]:[x.k-.5,x.k+.5]);
+            const nowIdx=live?ends.findIndex(([a,b])=>nowH>=a&&nowH<b):-1;
+            return (live&&nowIdx<0?'<p class="nowLine">It\'s '+clock(nowH)+'</p>':"")+
+            '<div class="strip">'+R0.stops.map((x,i)=>{const past=live&&x.k!=null&&ends[i][1]<=nowH;const now=i===nowIdx;
+              return '<div class="'+(past?"past":"")+(now?" now":"")+'">'+(now?'<em class="nowTag">Now · '+clock(nowH)+'</em>':"")+'<small>'+esc(x.when.split("–")[0])+' · '+esc(x.where)+(past?' · done':"")+'</small><b>'+T(x.t)+'</b><span>'+x.do.replace(/<[^>]+>/g,"").split(".")[0]+'.</span></div>'}).join("")+'</div>'})()+
+        '</div>'+
+      '</div>'+
+      '<section class="stage" aria-label="What to wear">'+
+                '<p class="caption" id="hl">'+R0.head+'</p>'+
+        '<div class="dollStage"><svg class="leaders" aria-hidden="true"></svg>'+
+          '<div class="lcol"></div><div class="doll">'+dollSVG(worn)+'</div><div class="rcol"></div>'+
+          worn.map(w=>{const a=anchorFor(w.id,worn);return '<button type="button" class="tag side-'+a[2]+'" data-id="'+w.id+'" data-ax="'+a[0]+'" data-ay="'+a[1]+'"><b>'+esc(ITEM[w.id].n)+(w.opt?" (optional)":"")+'</b>'+(w.why?'<span>'+esc(w.why)+'</span>':"")+under(w.id)+'</button>'}).join("")+
+        '</div>'+
+        (bag.length?'<div class="bagRow"><span class="listH">Also bring</span>'+bag.map(b=>'<button type="button" class="tag bagTag" data-id="'+b.id+'"><b>'+esc(ITEM[b.id].n)+'</b>'+(b.why?'<span>'+esc(b.why)+'</span>':"")+'</button>').join("")+'</div>':"")+
+      '</section>'+
+      (R0.acts.length?'<section class="goodday" aria-label="Good and bad things to do">'+
+     '<div class="gdCol"><h2 class="gdH">'+(isToday?"Today":"Tomorrow")+'\'s a good day to…</h2><ul>'+R0.acts.filter(a=>a.ok).slice(0,7).map(a=>'<li><b>'+esc(a.label)+'</b><span>'+esc(a.why)+'</span></li>').join("")+'</ul></div>'+
+     (R0.acts.some(a=>!a.ok)?'<div class="gdCol bad"><h2 class="gdH">Not a good day to…</h2><ul>'+R0.acts.filter(a=>!a.ok).slice(0,6).map(a=>'<li><b>'+esc(a.label)+'</b><span>'+esc(a.why)+'</span></li>').join("")+'</ul></div>':"")+
+   '</section>':"")+
+     '</section>';
+   })()+
+   (R0.heads.length?'<div class="secHead"><h2 class="sec">Heads up</h2><p>Only what matters today.</p></div><div class="heads">'+R0.heads.map(h=>'<div class="head '+(h.cls||"")+'"><span class="ic" aria-hidden="true">'+h.ic+'</span><div><h3>'+esc(h.h)+'</h3><p>'+esc(h.p)+'</p></div></div>').join("")+'</div>':"")+
+   '<div class="secHead"><h2 class="sec">The numbers, explained</h2><p>What your weather app is actually telling you.</p></div>'+
+   '<div class="metrics">'+R0.m.map(x=>'<article class="metric"><div class="top"><h3>'+esc(x.h)+'</h3><div class="val">'+esc(x.val)+(x.u?'<small>'+esc(x.u)+'</small>':"")+'</div></div>'+scaleHTML(x.scale)+'<p>'+esc(x.p)+'</p><p class="you"><b>For you:</b> '+esc(x.you)+'</p></article>').join("")+'</div>'+
+   (isExample||!isToday?"":'<div class="secHead" id="fbSec"><h2 class="sec">How did today feel?</h2><p>Tell me tonight. Each answer tunes tomorrow\'s report.</p></div>'+fbForm(todayKey(),"today"))+
+   (live?'<div class="src"><span>Forecast from Open-Meteo for '+esc(S.settings.locName||S.settings.loc)+', updated '+new Date(accu.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(accu.cached?" (saved copy)":"")+'.</span><span style="opacity:.5">'+D.v+'</span><button class="link" id="refreshAccu">Refresh</button>'+(isToday?'<button class="link" id="editNums">Use my own numbers instead</button>':"")+'</div>'
+   :'<div class="src"><span>Numbers from '+esc(current.src)+'.</span>'+(isExample?"":'<button class="link" id="editNums">Edit the numbers</button><button class="link" id="newShot">Start over with a new screenshot</button>')+(accuState==="ok"&&!isExample?'<button class="link" id="useAccu">Use the live forecast instead</button>':"")+'</div>');
+  wire(r);wireDoll(r);
+}
+function fbForm(key,label){
+  const f=(S.days[key]&&S.days[key].fb)||{};const tags=f.tags||[];
+  const seg=(name)=>'<div class="seg" role="group" aria-label="'+name+'">'+[["cold","Too cold"],["ok","Just right"],["hot","Too hot"]].map(([v,t])=>'<button type="button" data-fb="'+name+'" data-v="'+v+'" aria-pressed="'+(f[name]===v)+'">'+t+'</button>').join("")+'</div>';
+  const T2=[["umbrella","Wish I'd had an umbrella"],["noUmbrella","Didn't need the umbrella"],["warmer","Needed a warmer layer"],["lighter","Should've gone lighter"]];
+  return '<div class="card fbCard" data-key="'+key+'"><div class="fbRow"><b>Outside</b>'+seg("out")+'</div><div class="fbRow"><b>Inside</b>'+seg("in")+'</div>'+
+    '<div class="fbRow"><b>Anything else?</b><div class="tags">'+T2.map(([v,t])=>'<button type="button" data-tag="'+v+'" aria-pressed="'+tags.includes(v)+'">'+t+'</button>').join("")+'</div></div>'+
+    '<div class="formActs"><button class="btn" data-fbsave>'+(f.when?"Update":"Save")+'</button><span class="saved" role="status">'+(f.when?"Saved. I'll use this from tomorrow.":"")+'</span></div></div>';
+}
+function wire(root){
+  root.querySelectorAll(".fbCard").forEach(card=>{
+    const key=card.dataset.key;const draft=JSON.parse(JSON.stringify((S.days[key]&&S.days[key].fb)||{tags:[]}));if(!draft.tags)draft.tags=[];
+    card.querySelectorAll("[data-fb]").forEach(b=>b.onclick=()=>{draft[b.dataset.fb]=b.dataset.v;card.querySelectorAll('[data-fb="'+b.dataset.fb+'"]').forEach(x=>x.setAttribute("aria-pressed",x===b))});
+    card.querySelectorAll("[data-tag]").forEach(b=>b.onclick=()=>{const t=b.dataset.tag;const on=!draft.tags.includes(t);draft.tags=draft.tags.filter(x=>x!==t&&!(on&&((t==="umbrella"&&x==="noUmbrella")||(t==="noUmbrella"&&x==="umbrella")||(t==="warmer"&&x==="lighter")||(t==="lighter"&&x==="warmer"))));if(on)draft.tags.push(t);card.querySelectorAll("[data-tag]").forEach(x=>x.setAttribute("aria-pressed",draft.tags.includes(x.dataset.tag)))});
+    card.querySelector("[data-fbsave]").onclick=()=>{
+      const ok=card.querySelector(".saved");
+      if(!draft.out&&!draft.in&&!draft.tags.length){ok.textContent="Pick at least one answer.";ok.style.color="var(--pinkInk)";return}
+      const before=learned();draft.when=Date.now();
+      S.days[key]=S.days[key]||{};S.days[key].fb=draft;delete S.skipFb[key];save();
+      const after=learned();ok.style.color="";ok.textContent="Saved. "+change(before,after);
+      card.querySelector("[data-fbsave]").textContent="Update";renderStrip();renderLearned();
+      if(card.closest("#fbStripCard")){setTimeout(()=>{$("fbStripCard")&&$("fbStripCard").remove()},1600)}
+    };
+  });
+  const q=id=>root.querySelector("#"+id);
+  if(q("editNums"))q("editNums").onclick=()=>openForm(current.wx,current.plan,"Edit today's numbers");
+  root.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{view=+b.dataset.day;renderAll()});
+  const savePlan=()=>{if(isExample){current.plan={act:$("planAct").value,actTime:($("planTime")||{}).value||current.plan.actTime||"18:30"};renderReport();return}
+    const key=current.key||todayKey();const plan={act:$("planAct").value,actTime:($("planTime")||{}).value||current.plan.actTime||"18:30"};
+    S.days[key]={...(S.days[key]||{}),plan};save();renderAll();const a=$("planAct");if(a)a.focus()};
+  if(q("planAct"))q("planAct").onchange=savePlan;
+  if(q("planTime"))q("planTime").onchange=savePlan;
+  if(q("placeBtn"))q("placeBtn").onclick=openDrawer;
+  if(q("editCommute"))q("editCommute").onclick=()=>{openDrawer();setTimeout(()=>$("s-mode").focus(),30)};
+  if(q("refreshAccu"))q("refreshAccu").onclick=loadAccu;
+  if(q("useAccu"))q("useAccu").onclick=()=>{const t=S.days[todayKey()];if(t){t.src="AccuWeather";delete t.wx}save();view=0;renderAll()};
+  if(q("newShot"))q("newShot").onclick=()=>{current=null;isExample=false;shots=[];$("thumbs").innerHTML="";$("readStatus").textContent="";showStart();renderReport();scrollTo(0,0)};
+  if(q("exitEx"))q("exitEx").onclick=()=>{current=null;isExample=false;showStart();renderAll();scrollTo(0,0)};
+}
+function change(a,b){
+  const bits=[];const d=b.out-a.out,e=b.inn-a.inn;
+  if(Math.abs(d)>=.5)bits.push("next time I'll dress you "+(d>0?"warmer":"lighter")+" for outside");
+  if(Math.abs(e)>=.5)bits.push((bits.length?"":"next time I'll plan ")+(e>0?"a warmer":"a lighter")+" layer for inside");
+  if(b.umbrella!==a.umbrella)bits.push("umbrella from "+Math.round(b.umbrella)+"% rain");
+  return bits.length?cap1(bits.join("; "))+".":"Noted. Nothing changes yet."}
+
+/* "how did yesterday feel?" strip */
+function pendingFb(){const t=todayKey();return Object.keys(S.days).filter(k=>k<t&&S.days[k].wx&&!S.days[k].fb&&!S.skipFb[k]).sort().pop()||null}
+function renderStrip(){
+  const k=pendingFb();const strip=$("fbStrip");
+  if(!k||$("fbStripCard")){strip.hidden=true;return}
+  strip.hidden=false;const y=new Date();y.setDate(y.getDate()-1);
+  $("fbStripText").textContent="How did "+(k===todayKey(y)?"yesterday":dayName(k))+" feel? Two taps teach me what you like.";
+  $("fbStripGo").onclick=()=>{strip.hidden=true;const box=document.createElement("div");box.id="fbStripCard";box.style.marginBottom="22px";box.innerHTML='<span class="kicker yellow">'+(k===todayKey(y)?"Yesterday":dayName(k))+'</span>'+fbForm(k);strip.after(box);wire(box);box.querySelector("button").focus()};
+  $("fbStripSkip").onclick=()=>{S.skipFb[k]=1;save();renderStrip()};
+}
+function renderLearned(){
+  const L=learned();
+  const li=[];
+  if(!L.n)li.push("Nothing yet. After a few days of “how did it feel?”, I'll know if you run cold or warm, outside and inside.");
+  else{
+    li.push(cap1(runs(L.out,"outside")||"outside, you feel temperatures about like the forecast")+".");
+    li.push(cap1(runs(L.inn,"inside")||"inside, the usual indoor temperatures suit you")+".");
+    li.push("I suggest an umbrella from "+Math.round(L.umbrella)+"% rain.");
+  }
+  $("learnedList").innerHTML=li.map(x=>"<li>"+esc(x)+"</li>").join("");
+  const lab={cold:"too cold",ok:"just right",hot:"too hot"};
+  $("historyList").innerHTML=L.fb.slice(0,8).map(([k,d])=>"<li>"+esc(dayName(k)+", "+k.slice(5).replace("-","/"))+": outside "+esc(lab[d.fb.out]||"–")+", inside "+esc(lab[d.fb.in]||"–")+(d.wx?" (high "+T(d.wx.high)+")":"")+"</li>").join("");
+  $("resetLearn").hidden=!L.n;
+}
+function noteStore(){$("storeNote").textContent=storeKind==="account"?"Saved to your account, so it follows you between devices.":"Saved in this browser.";}
+function renderAll(){try{renderAll0()}catch(e){diag("step","render error: "+(e&&e.message));accuState="error";accuErr="render error: "+(e&&e.message);current=null;try{renderReport()}catch(_){}}}
+function renderAll0(){
+  renderIssue();
+  const tk=todayKey(),t=S.days[tk];
+  const manual=!!(t&&t.wx&&t.src&&t.src!=="AccuWeather");
+  if(!isExample){
+    if(accuState==="ok"&&!(view===0&&manual)){
+      const wx=toWx(view),key=accuKey(view);
+      const nd=accu.daily.dailyForecast[view+1];
+      current=wx?{wx,plan:{act:"desk",actTime:"18:30",nextPop:nd?Math.max(nd.day.rainProbabilityValue||0,nd.day.snowProbabilityValue||0):null},src:"AccuWeather",key}:null;   // the activity menu is gone, so an old saved choice no longer applies
+      if(!manual){const w0=toWx(0);if(w0&&JSON.stringify(t&&t.wx)!==JSON.stringify(w0)){S.days[tk]={...(t||{}),wx:w0,src:"AccuWeather"};save()}}
+    }else if(t&&t.wx&&(manual||accuState!=="ok")){view=0;current={wx:t.wx,plan:{act:"desk"},src:t.src||"your numbers",key:tk}}
+    else current=null;
+  }
+  renderReport();renderStrip();renderLearned();syncSetup();
+}
+
+/* ---------------- input: screenshot / form / examples ---------------- */
+function showStart(){$("inStart").hidden=false;$("wxForm").hidden=true;$("inputCard").hidden=false}
+const FIELDS=["high","low","now","feels","pop","amt","when","cond","wind","gust","rh","dew","uv","aqi","sunset"];
+function openForm(wx,plan,title){
+  $("inputCard").hidden=false;$("report").hidden=true;$("inStart").hidden=true;$("wxForm").hidden=false;
+  $("formTitle").textContent=title||"Check today's numbers";$("formErr").textContent="";
+  $("formHint").textContent=wx&&wx._read?"Here's what I read from your screenshot. Fix anything that's off, then make the report.":"Fill in what your app shows. Only high, low and rain chance are needed; the rest makes the report sharper.";
+  wx=wx||{};const v=(id,val)=>{$("f-"+id).value=val==null?"":val};
+  v("high",outT(wx.high));v("low",outT(wx.low));v("now",outT(wx.now));v("feels",outT(wx.feels));v("pop",wx.pop??"");v("amt",outR(wx.amt));
+  v("when",wx.rainWhen||"");$("f-cond").value=wx.cond||"partly";v("wind",outW(wx.wind));v("gust",outW(wx.gust));v("rh",wx.rh??"");v("dew",outT(wx.dew));v("uv",wx.uv??"");v("aqi",wx.aqi??"");v("sunset",wx.sunset||"");
+  $("f-act").value=(plan&&plan.act)||"desk";$("f-actTime").value=(plan&&plan.actTime)||"18:30";$("actTimeField").hidden=!["out","gym"].includes($("f-act").value);
+  $("wxForm")._hourly=wx.hourly||null;$("wxForm")._src=wx._read?"your screenshot":(current&&current.src)||"numbers you typed";
+  setUnitLabels();$("f-high").focus();scrollTo(0,0);
+}
+function setUnitLabels(){const c=U()==="C";["uT1","uT2"].forEach(i=>$(i).textContent=c?"°C":"°F");$("uR").textContent=c?"mm":"in";$("uW1").textContent=c?"km/h":"mph"}
+$("f-act").onchange=()=>{$("actTimeField").hidden=!["out","gym"].includes($("f-act").value)};
+$("wxForm").onsubmit=e=>{
+  e.preventDefault();const g=id=>num($("f-"+id).value);
+  const wx={high:inT(g("high")),low:inT(g("low")),now:inT(g("now")),feels:inT(g("feels")),pop:g("pop"),amt:inR(g("amt")),rainWhen:$("f-when").value,cond:$("f-cond").value,
+    wind:inW(g("wind")),gust:inW(g("gust")),rh:g("rh"),dew:inT(g("dew")),uv:g("uv"),aqi:g("aqi"),sunset:$("f-sunset").value||null,hourly:$("wxForm")._hourly};
+  const miss=[];if(wx.high==null)miss.push("high");if(wx.low==null)miss.push("low");if(wx.pop==null)miss.push("rain chance");
+  if(miss.length){$("formErr").textContent="Add the "+miss.join(", ")+" to continue.";$("f-"+(wx.high==null?"high":wx.low==null?"low":"pop")).focus();return}
+  if(wx.low>wx.high){const t=wx.low;wx.low=wx.high;wx.high=t}
+  wx.pop=clamp(wx.pop,0,100);
+  const plan={act:$("f-act").value,actTime:$("f-actTime").value};
+  current={wx,plan,src:$("wxForm")._src,key:todayKey()};isExample=false;view=0;
+  S.days[todayKey()]={...(S.days[todayKey()]||{}),wx,plan,src:current.src};save();
+  renderReport();renderLearned();scrollTo(0,0);
+};
+$("formCancel").onclick=()=>{if(current){renderReport()}else showStart()};
+$("typeBtn").onclick=()=>openForm(null,{act:"desk"});
+
+const EX={
+ wind:{label:"a windy November day",wx:{high:52,low:41,now:44,feels:37,pop:20,amt:0,cond:"partly",wind:16,gust:30,rh:55,dew:30,uv:2,aqi:35,sunset:"16:38"}},
+ rain:{label:"a rainy, raw day",wx:{high:48,low:42,pop:90,amt:.6,rainWhen:"afternoon",cond:"rain",wind:12,gust:22,rh:92,dew:41,uv:1,aqi:22,sunset:"16:38"}},
+ sticky:{label:"a sticky summer day",wx:{high:91,low:76,pop:40,amt:.2,rainWhen:"evening",cond:"partly",wind:6,rh:60,dew:72,uv:9,aqi:85,sunset:"20:25"}},
+};
+document.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{const ex=EX[b.dataset.ex];current={wx:{...ex.wx},plan:{act:b.dataset.ex==="sticky"?"out":"desk",actTime:"18:30"},src:"an example",label:ex.label};isExample=true;renderReport();scrollTo(0,0)});
+
+/* screenshots → Claude reads the numbers */
+let sample=null;
+const drop=$("drop"),file=$("file");
+drop.onclick=()=>file.click();
+drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()}};
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};
+drop.ondragleave=()=>drop.classList.remove("over");
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");takeFiles(e.dataTransfer.files)};
+file.onchange=()=>{takeFiles(file.files);file.value=""};
+document.addEventListener("paste",e=>{if($("inStart").hidden||$("inputCard").hidden)return;const f=[...(e.clipboardData||{}).items||[]].filter(i=>i.type.startsWith("image/")).map(i=>i.getAsFile());if(f.length)takeFiles(f)});
+function takeFiles(list){
+  const imgs=[...list].filter(f=>f&&f.type.startsWith("image/")).slice(0,3);if(!imgs.length)return;
+  shots=imgs;$("thumbs").innerHTML="";imgs.forEach(f=>{const im=new Image();im.alt="Your screenshot";im.src=URL.createObjectURL(f);$("thumbs").appendChild(im)});
+  readShots();
+}
+async function readShots(){
+  const st=$("readStatus");st.className="status";
+  if(!sample){st.className="status err";st.textContent="Reading screenshots isn't available here. Type the numbers instead; it takes a minute.";return}
+  st.textContent="Reading your screenshot…";
+  const prompt='You read weather app screenshots. Extract today\'s forecast for the place shown. Reply with ONLY a JSON object, no prose, using null for anything not visible:\n'+
+   '{"place":string|null,"tempUnit":"F"|"C","high":number,"low":number,"now":number|null,"feels":number|null,"pop":number|null (today\'s max chance of precipitation, 0-100),'+
+   '"amt":number|null,"amtUnit":"in"|"mm"|"cm"|null,"cond":"clear"|"partly"|"cloudy"|"rain"|"storm"|"snow"|"fog","wind":number|null,"gust":number|null,"windUnit":"mph"|"km/h"|"m/s"|null,'+
+   '"rh":number|null,"dew":number|null,"uv":number|null,"aqi":number|null,"sunset":"HH:MM" 24-hour|null,"rainWhen":"morning"|"afternoon"|"evening"|"all"|null,'+
+   '"hourly":[{"hour":0-23,"temp":number|null,"rainChance":number|null}] for today\'s hours that are visible, else []}. Temperatures and dew point in tempUnit.';
+  try{
+    let lim=null;try{lim=await sample.limits()}catch(e){}
+    if(lim&&!lim.images)throw{code:"no_images"};
+    const res=await sample.json(prompt,{images:shots,modelTier:"default"});
+    const x=res&&typeof res==="object"?(res.value||res):null;if(!x||x.high==null)throw{code:"empty"};
+    const c=x.tempUnit==="C",t=v=>v==null?null:(c?toF(Number(v)):Number(v));
+    const w=v=>v==null?null:(x.windUnit==="km/h"?v/1.609:x.windUnit==="m/s"?v*2.237:Number(v));
+    const a=v=>v==null?null:(x.amtUnit==="mm"?v/25.4:x.amtUnit==="cm"?v/2.54:Number(v));
+    const wx={_read:1,high:t(x.high),low:t(x.low),now:t(x.now),feels:t(x.feels),pop:x.pop,amt:a(x.amt),cond:x.cond||"partly",wind:w(x.wind),gust:w(x.gust),rh:x.rh,dew:t(x.dew),uv:x.uv,aqi:x.aqi,sunset:x.sunset,rainWhen:x.rainWhen||"",
+      hourly:Array.isArray(x.hourly)?x.hourly.map(h=>({hour:h.hour,temp:t(h.temp),rainChance:h.rainChance})).filter(h=>h.hour!=null):null};
+    st.textContent="";openForm(wx,{act:(current&&current.plan&&current.plan.act)||"desk"},"Check these numbers");
+  }catch(e){
+    st.className="status err";
+    st.textContent=e&&e.code==="not_granted"?"Reading screenshots needs permission. You can type the numbers instead.":e&&e.code==="rate_limited"?"Too many tries in a row. Wait a minute, or type the numbers.":"I couldn't read the numbers from that. Try a screenshot of the daily view, or type them in.";
+  }
+}
+
+/* ---------------- setup drawer ---------------- */
+function syncSetup(){const s=S.settings;if(document.activeElement!==$("s-loc"))$("s-loc").value=s.loc||"";$("locNow").textContent=s.locName?"Forecast for: "+s.locName:"";$("s-mode").value=s.mode;$("s-leave").value=s.leave;$("s-back").value=s.back;$("s-mins").value=s.mins;
+  document.querySelectorAll("[data-unit]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.unit===s.units));
+  ["s-leave","s-back","s-mins"].forEach(i=>$(i).disabled=s.mode==="none")}
+let lastFocus=null;
+function openDrawer(){lastFocus=document.activeElement;$("drawer").hidden=false;$("scrim").hidden=false;syncSetup();renderLearned();$("dClose").focus()}
+function closeDrawer(){$("drawer").hidden=true;$("scrim").hidden=true;if(lastFocus)lastFocus.focus()}
+$("dClose").onclick=closeDrawer;$("scrim").onclick=closeDrawer;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("drawer").hidden)closeDrawer()});
+let setT=null;
+function setChanged(){const s=S.settings;s.loc=$("s-loc").value.trim();s.mode=$("s-mode").value;s.leave=$("s-leave").value||"08:30";s.back=$("s-back").value||"18:00";s.mins=num($("s-mins").value)??10;syncSetup();renderIssue();renderReport();clearTimeout(setT);setT=setTimeout(save,500)}
+["s-loc","s-mode","s-leave","s-back","s-mins"].forEach(i=>$(i).addEventListener("input",setChanged));
+document.querySelectorAll("[data-unit]").forEach(b=>b.onclick=()=>{S.settings.units=b.dataset.unit;syncSetup();setUnitLabels();renderReport();renderLearned();save()});
+$("resetLearn").onclick=()=>{Object.values(S.days).forEach(d=>delete d.fb);save();renderLearned();renderReport();renderStrip()};
+
+/* ---------------- AccuWeather ---------------- */
+let accuRun=0,t0=Date.now();const D={mcp:"…",db:"…",saved:"…",step:"",v:"gh1"};
+function diag(k,v){if(k)D[k]=v;const el=$("diag");if(el)el.textContent="page "+D.v+" · connectors: "+D.mcp+" · storage: "+D.db+" · saved copy: "+D.saved+(D.step?" · "+D.step:"")}
+setInterval(()=>{if(accuState==="loading")diag()},1000);
+function slowNote(){
+  $("loadText").textContent="Still waiting on AccuWeather…";
+  const h=$("loadCard").querySelector(".hint");
+  h.innerHTML="If Claude is asking whether this page may use AccuWeather, choose Allow. <button class=\"link\" id=\"slowType\">Add the numbers myself</button><br><small>Waiting on: "+esc(accuStep||"connecting")+(accuServer?" ("+esc(accuServer)+")":"")+"</small>";
+  $("slowType").onclick=()=>{accuState="error";accuErr="stopped waiting at "+accuStep;current=null;renderAll()};
+}
+let mcp=null,accu=null,accuState="none",view=new Date().getHours()>=19?1:0;
+const pn=v=>{if(v==null)return null;if(typeof v==="number")return v;const m=String(v).match(/-?\d+(\.\d+)?/);return m?Number(m[0]):null};
+function unwrap(r){let x=r&&r.payload!==undefined?r.payload:r;if(x&&x.structuredContent)x=x.structuredContent;
+  if(x&&Array.isArray(x.content)){const t=x.content.find(c=>c&&c.type==="text");if(t){try{x=JSON.parse(t.text)}catch(e){}}}
+  if(typeof x==="string"){try{x=JSON.parse(x)}catch(e){}}return x}
+// the connector's display name has a ® in it; try both spellings and remember the one that answers
+const ACCU_NAMES=["AccuWeather®","AccuWeather"];let accuServer=null,accuErr="";
+const within=(p,ms,what)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r({code:"timeout",message:what+" didn't answer in "+Math.round(ms/1000)+"s"}),ms))]);
+let accuStep="";
+async function pickServer(){
+  if(accuServer||!mcp.listTools)return accuServer;
+  for(const n of ACCU_NAMES){try{const r=await within(mcp.listTools(n),5000,"listing tools");const sv=r&&r.servers&&r.servers.find(x=>x&&x.tools&&x.tools.length);if(sv){accuServer=sv.server||n;return accuServer}}catch(e){}}
+  return null}
+async function accuCall(tool,qp){
+  accuStep=tool.replace("widgets-","").replace("-claude","");const ts=Date.now();diag("step","asking for "+accuStep+(accuServer?" from "+accuServer:"")+"…");
+  await pickServer();
+  if(accuServer){const out=unwrap(await mcp.callTool(accuServer,tool,{queryParams:qp}));diag("step",accuStep+" ok in "+((Date.now()-ts)/1000).toFixed(1)+"s");return out}
+  // unknown spelling: ask both at once, keep whichever answers
+  const r=await Promise.any(ACCU_NAMES.map(n=>mcp.callTool(n,tool,{queryParams:qp}).then(x=>({n,x}))));
+  accuServer=r.n;return unwrap(r.x)}
+function iconCond(ic,ts){if(ts>=40||[15,16,17,41,42].includes(ic))return"storm";if([12,13,14,18,26,39,40].includes(ic))return"rain";if([19,20,21,22,23,24,25,29,43,44].includes(ic))return"snow";if(ic===11)return"fog";if([1,2,33,34].includes(ic))return"clear";if([3,4,5,35,36,37].includes(ic))return"partly";return"cloudy"}
+function accuKey(i){const d=accu&&accu.daily.dailyForecast[i];return d?String(d.date).slice(0,10):todayKey()}
+function alertsOf(list){return(Array.isArray(list)?list:[]).map(a=>typeof a==="string"?{title:a}:{title:a.title||a.headline||a.name||a.description||a.category||"Weather alert",text:a.text||a.summary||(a.description&&a.description!==a.title?a.description:"")||""})}
+function toWx(i){
+  const D=accu.daily.dailyForecast||[],d=D[i];if(!d)return null;
+  const date=String(d.date).slice(0,10),prev=i>0?D[i-1].night:null;
+  const hrs=((accu.hourly&&accu.hourly.hourlyForecast)||[]).filter(h=>String(h.date).slice(0,10)===date);
+  const day=d.day||{},night=d.night||{},dx=day.extended||{},nx=night.extended||{};
+  const P=x=>Math.max(x&&x.rainProbabilityValue||0,x&&x.snowProbabilityValue||0,x&&x.iceProbabilityValue||0);
+  const dayPop=P(day),nightPop=P(night),earlyPop=prev?P(prev):dayPop;
+  const given={};hrs.forEach(h=>{const hr=Number(String(h.date).slice(11,13));const e=h.extended||{};given[hr]={hour:hr,temp:h.temperatureValue,feels:h.realFeelValue,rainChance:pn(e.rainProbability!=null?e.rainProbability:h.precip),dew:pn(e.dewPoint)}});
+  const hourly=[];for(let h=0;h<24;h++)hourly.push(given[h]||{hour:h,temp:null,rainChance:h<7?earlyPop:h<19?dayPop:nightPop});
+  const temps=hrs.map(h=>h.temperatureValue).filter(v=>v!=null);
+  const lows=[night.temperature,prev&&prev.temperature,...temps].filter(v=>v!=null);
+  const high=Math.max(day.temperature??-99,...temps),low=Math.min(...lows);
+  const cur=i===0&&accu.current?accu.current.currentConditions:null,ce=cur&&cur.extended||{};
+  const dews=hrs.map(h=>pn((h.extended||{}).dewPoint)).filter(v=>v!=null);
+  const ssH=((accu.hourly&&accu.hourly.hourlyForecast)||[]).find(h=>h.sunSetDate);
+  const snow=(dx.snowValue||0)+(nx.snowValue||0);
+  let cond=iconCond(day.icon,pn(dx.thunderstormProbability));if(snow>=.5||(day.snowProbabilityValue||0)>=50)cond="snow";
+  const aqo=i===0&&accu.current&&accu.current.currentAirQuality;
+  return{high,low,now:cur?cur.temperatureValue:null,feels:cur?cur.realFeelValue:null,
+    pop:Math.max(dayPop,i===0?nightPop:0),amt:Math.round(((dx.rainValue||0)+(nx.rainValue||0)+(dx.iceValue||0))*100)/100,cond,
+    wind:pn(dx.wind),gust:pn(dx.gusts),rh:cur?ce.humidityValue??pn(ce.humidity):null,
+    dew:cur&&ce.dewPoint?pn(ce.dewPoint):dews.length?Math.round(dews.reduce((a,b)=>a+b,0)/dews.length):null,
+    uv:dx.uv&&dx.uv.value!=null?Math.round(dx.uv.value):null,
+    aqi:i===0&&accu.aqi!=null?Math.round(accu.aqi):null,
+    aq:aqo&&aqo.overallPlumeLabsIndex!=null?{index:aqo.overallPlumeLabsIndex,category:aqo.category||"",statement:aqo.hazardStatement||""}:null,
+    sunset:ssH?String(ssH.sunSetDate).slice(11,16):null,rainWhen:"",hourly,
+    alerts:alertsOf([...(d.alerts||[]),...(i===0&&accu.current?accu.current.alerts||[]:[])]),
+    phrase:day.longPhrase||day.phrase||"",short:day.phrase||""};
+}
+/* a saved copy of the last forecast, so the page opens instantly and still works if a live call stalls */
+function cacheRef(){const k=S.settings.locKey||(/new york|nyc|manhattan/i.test(S.settings.loc||"New York")?"2627449":null);return dbRef&&k?dbRef.doc("forecast/"+k):null}
+async function readCache(){
+  const ref=cacheRef();if(!ref){diag("saved",dbRef?"no place yet":"no storage");return}
+  try{diag("saved","looking…");const snap=await within(ref.get(),10000,"saved forecast");if(!snap.exists){diag("saved","none");return}const x=JSON.parse(JSON.stringify(snap.data()));
+    if(!x||!x.daily||!x.at||Date.now()-x.at>20*3600e3){diag("saved","too old");return}
+    diag("saved","found");
+    if(accu&&accu.at>=x.at)return;
+    accu={daily:x.daily,hourly:x.hourly||null,current:x.current||null,at:x.at,cached:true};
+    if(accuState!=="ok"){accuState="ok";renderAll()}
+  }catch(e){diag("saved","error "+(e&&(e.code||e.message)))}
+}
+async function writeCache(){const ref=cacheRef();if(!ref||!accu||accu.cached)return;
+  try{await ref.set({daily:accu.daily,hourly:accu.hourly,current:accu.current,at:accu.at})}catch(e){}}
+async function loadAccu(){
+  if(!mcp)return;
+  const quiet=accuState==="ok"&&accu;           // already showing a saved copy: refresh without a spinner
+  if(!quiet){accuState="loading";if(!current||current.src==="AccuWeather")current=null;renderAll()}
+  const myRun=++accuRun;
+  setTimeout(()=>{if(accuState==="loading"&&accuRun===myRun)slowNote()},12000);
+  if(!quiet)setTimeout(()=>{if(accuState==="loading")readCache()},1500);
+  if(!S.settings.locKey&&/new york|nyc|manhattan/i.test(S.settings.loc||"New York")){S.settings.locKey="2627449";S.settings.locName="Civic Center, NY"}
+  try{
+    if(!S.settings.locKey){const r=await accuCall("widgets-search-claude",{query:S.settings.loc||"New York"});const f=r&&r.results&&r.results[0];if(!f)throw new Error("no place");S.settings.locKey=f.locationKey;S.settings.locName=f.name;save()}
+    const k=S.settings.locKey;
+    const daily=await accuCall("widgets-daily-claude",{locationKey:k});
+    const hourly=await accuCall("widgets-hourly-claude",{locationKey:k}).catch(()=>null);
+    const cur=await accuCall("widgets-current-claude",{locationKey:k}).catch(()=>null);
+    if(!daily||!Array.isArray(daily.dailyForecast)||!daily.dailyForecast.length)throw new Error("empty");
+    accu={daily,hourly,current:cur,at:Date.now()};accuState="ok";writeCache();
+  }catch(e){if(quiet||accu){accuErr=String(e&&(e.code||e.message)||e);if(!quiet){accuState="ok";renderAll()}return}accuState="error";current=null;if(e&&e.errors)e=e.errors[0];accuErr=e&&(e.code||e.message)?[e.code,e.message].filter(Boolean).join(": "):String(e)}
+  if(myRun!==accuRun)return;
+  renderAll();
+}
+async function findPlaces(){
+  const q=$("s-loc").value.trim();const box=$("locRes");if(!q||!mcp)return;
+  box.innerHTML='<span class="hint">Searching…</span>';
+  try{const r=await accuCall("widgets-search-claude",{query:q});const list=(r&&r.results)||[];
+    if(!list.length){box.innerHTML='<span class="hint">No places found. Try a city name or ZIP code.</span>';return}
+    box.innerHTML="";list.slice(0,6).forEach(p=>{const b=document.createElement("button");b.type="button";b.textContent=p.name;b.setAttribute("aria-current",String(p.locationKey===S.settings.locKey));
+      b.onclick=()=>{S.settings.locKey=p.locationKey;S.settings.locName=p.name;S.settings.loc=q;save();box.innerHTML="";syncSetup();loadAccu()};box.appendChild(b)});
+    box.querySelector("button").focus();
+  }catch(e){box.innerHTML='<span class="hint">Couldn\'t search right now.</span>'}
+}
+$("locFind").onclick=()=>mcp?findPlaces():searchCities($("s-loc").value.trim(),$("locRes"));
+$("s-loc").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();mcp?findPlaces():searchCities($("s-loc").value.trim(),$("locRes"))}});
+
+/* ---------------- Open-Meteo (free, no key) + your location ---------------- */
+const WMO={0:"Clear and sunny",1:"Mostly sunny",2:"Partly cloudy",3:"Cloudy",45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Heavy rain showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorms",96:"Thunderstorms with hail",99:"Thunderstorms with hail"};
+const wmoIcon=c=>c<=1?1:c===2?3:c===3?7:c===45||c===48?11:(c>=51&&c<=57)||(c>=80&&c<=82)?12:c>=61&&c<=67?18:(c>=71&&c<=77)||c===85||c===86?22:c>=95?15:7;
+function omToAccu(f,aq){
+  const H=f.hourly,D=f.daily;
+  const hours=H.time.map((t,i)=>({date:t,temperatureValue:Math.round(H.temperature_2m[i]),realFeelValue:Math.round(H.apparent_temperature[i]),precip:(H.precipitation_probability[i]??0)+"%",
+    extended:{rainProbability:(H.precipitation_probability[i]??0)+"%",dewPoint:Math.round(H.dew_point_2m[i])+"°"},_p:H.precipitation[i]||0,_w:H.wind_speed_10m[i]||0,_g:H.wind_gusts_10m[i]||0}));
+  const span=(date,a,b)=>hours.filter(h=>h.date.slice(0,10)===date&&+h.date.slice(11,13)>=a&&+h.date.slice(11,13)<b);
+  const pmax=a=>a.length?Math.max(...a.map(h=>parseFloat(h.precip)||0)):0,sum=a=>a.reduce((s,h)=>s+h._p,0),avg=a=>a.length?a.reduce((s,h)=>s+h._w,0)/a.length:0;
+  const dailyForecast=D.time.map((date,i)=>{
+    const dh=span(date,7,19),nh=[...span(date,19,24),...(D.time[i+1]?span(D.time[i+1],0,7):[])],code=D.weather_code[i],snowy=[71,73,75,77,85,86].includes(code);
+    const noon=hours.find(h=>h.date===date+"T12:00");if(noon&&D.sunset)noon.sunSetDate=D.sunset[i];
+    return{date:date+"T07:00",dayOfWeek:new Date(date+"T12:00").toLocaleDateString("en-US",{weekday:"short"}),alerts:[],
+      day:{temperature:Math.round(D.temperature_2m_max[i]),icon:wmoIcon(code),phrase:WMO[code]||"",longPhrase:"",rainProbabilityValue:snowy?0:pmax(dh),snowProbabilityValue:snowy?pmax(dh):0,iceProbabilityValue:0,
+        extended:{wind:Math.round(avg(dh))+" mph",gusts:Math.round(Math.max(0,...dh.map(h=>h._g)))+" mph",rainValue:snowy?0:+sum(dh).toFixed(2),snowValue:snowy?+(sum(dh)*10).toFixed(1):0,iceValue:0,thunderstormProbability:(code>=95?60:0)+"%",uv:{value:D.uv_index_max[i]}}},
+      night:{temperature:nh.length?Math.min(...nh.map(h=>h.temperatureValue)):Math.round(D.temperature_2m_min[i]),rainProbabilityValue:pmax(nh),snowProbabilityValue:0,extended:{rainValue:+sum(nh).toFixed(2),snowValue:0}}};
+  });
+  const c=f.current||{};
+  return{daily:{dailyForecast},hourly:{hourlyForecast:hours},current:{currentConditions:{temperatureValue:Math.round(c.temperature_2m),realFeelValue:Math.round(c.apparent_temperature),extended:{dewPoint:Math.round(c.dew_point_2m)+"°",humidityValue:c.relative_humidity_2m}},alerts:[]},
+    aqi:aq&&aq.current&&aq.current.us_aqi!=null?aq.current.us_aqi:null,at:Date.now()};
+}
+async function loadOM(){
+  const {lat,lon}=S.settings;if(lat==null)return;
+  // show the last forecast right away if it's recent, then refresh
+  let cached=null;try{cached=JSON.parse(localStorage.getItem("feelslike-forecast")||"null")}catch(e){}
+  if(cached&&cached.lat===lat&&cached.lon===lon&&Date.now()-cached.at<3*3600e3&&!accu){accu={...cached.data,cached:true};accuState="ok";renderAll()}
+  if(accuState!=="ok"){accuState="loading";current=null;renderAll()}
+  try{
+    const q="latitude="+lat+"&longitude="+lon;
+    const u="https://api.open-meteo.com/v1/forecast?"+q+"&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,dew_point_2m,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunset,uv_index_max&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=3";
+    const [f,aq]=await Promise.all([fetch(u).then(r=>{if(!r.ok)throw new Error("forecast service answered "+r.status);return r.json()}),
+      fetch("https://air-quality-api.open-meteo.com/v1/air-quality?"+q+"&current=us_aqi&timezone=auto").then(r=>r.ok?r.json():null).catch(()=>null)]);
+    accu=omToAccu(f,aq);accuState="ok";
+    try{localStorage.setItem("feelslike-forecast",JSON.stringify({lat,lon,at:accu.at,data:accu}))}catch(e){}
+  }catch(e){if(accu){accuState="ok"}else{accuState="error";accuErr=e.message||String(e);current=null}}
+  renderAll();
+}
+async function placeName(lat,lon){
+  try{const r=await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lon+"&localityLanguage=en");const j=await r.json();
+    const st=(j.principalSubdivisionCode||"").replace(/^[A-Z]{2}-/,"");return [j.city||j.locality,st||j.countryName].filter(Boolean).join(", ")||"Your location"}catch(e){return"Your location"}
+}
+function setPlace(lat,lon,name){S.settings.lat=+(+lat).toFixed(3);S.settings.lon=+(+lon).toFixed(3);S.settings.locName=name;S.settings.loc=name;accu=null;save();syncSetup();loadOM()}
+function useMyLocation(btn){
+  const st=$("readStatus");
+  if(!navigator.geolocation){st.className="status err";st.textContent="This browser can't share your location. Type your city instead.";return}
+  if(btn){btn.disabled=true;btn.textContent="Finding you…"}
+  navigator.geolocation.getCurrentPosition(async pos=>{const {latitude:la,longitude:lo}=pos.coords;const name=await placeName(la,lo);if(btn){btn.disabled=false;btn.textContent="Use my location"}closeDrawerIfOpen();setPlace(la,lo,name)},
+    err=>{if(btn){btn.disabled=false;btn.textContent="Use my location"}st.className="status err";st.textContent=err.code===1?"Location is blocked for this page. Allow it in your browser's site settings, or type your city.":"Couldn't find your location. Type your city instead."},
+    {enableHighAccuracy:false,timeout:12000,maximumAge:30*60e3});
+}
+function closeDrawerIfOpen(){if(!$("drawer").hidden)closeDrawer()}
+async function searchCities(q,box){
+  if(!q)return;box.innerHTML='<span class="hint">Searching…</span>';
+  try{const r=await fetch("https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&name="+encodeURIComponent(q));const j=await r.json();const list=j.results||[];
+    if(!list.length){box.innerHTML='<span class="hint">No places found. Try just the city name.</span>';return}
+    box.innerHTML="";list.forEach(p=>{const b=document.createElement("button");b.type="button";const label=[p.name,p.admin1,p.country_code==="US"?"":p.country].filter(Boolean).join(", ");b.textContent=label;
+      b.onclick=()=>{box.innerHTML="";closeDrawerIfOpen();setPlace(p.latitude,p.longitude,[p.name,p.country_code==="US"?(p.admin1||""):p.country].filter(Boolean).join(", "))};box.appendChild(b)});
+    box.querySelector("button").focus();
+  }catch(e){box.innerHTML='<span class="hint">Couldn\'t search right now.</span>'}
+}
+$("useLoc").onclick=()=>useMyLocation($("useLoc"));
+$("useLoc2").onclick=()=>useMyLocation($("useLoc2"));
+$("cityFind").onclick=()=>searchCities($("cityQ").value.trim(),$("cityRes"));
+$("cityQ").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchCities($("cityQ").value.trim(),$("cityRes"))}});
+
+/* ---------------- go ---------------- */
+renderAll();noteStore();
+(async()=>{
+  try{const w=window.claude;if(w&&w.use){[sample,mcp]=await Promise.all([w.use("sample"),w.use("mcp")])}}catch(e){sample=null}
+  diag("mcp",mcp?"ready":"unavailable");
+  $("locFind").hidden=false;$("drop").hidden=true;$("thumbs").hidden=true;
+  if(mcp){syncSetup();loadAccu()}
+  else if(S.settings.lat!=null){syncSetup();loadOM()}
+})();
+connectDb();
+setInterval(()=>{if(!mcp&&S.settings.lat!=null&&document.visibilityState==="visible")loadOM()},30*60e3);
+setInterval(()=>{if(current&&(!current.key||current.key===todayKey())&&!isExample&&document.visibilityState==="visible")renderReport()},5*60e3);
+})();
+</script>
+</body>
+</html>
