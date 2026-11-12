@@ -815,7 +815,7 @@ function build(wx,plan){
   if(aqi!=null&&aqi>100)heads.push({ic:"!",cls:"pk",h:"Air quality "+aqi,p:aqi>150?"Unhealthy for everyone. Keep outdoor exercise short.":"Unhealthy for sensitive groups (asthma, heart or lung conditions). Go easier on outdoor workouts."});
   if(act==="out"){const f=at(actH).f;heads.push({ic:"↗",h:"Your workout",p:"At "+clock(actH)+" it feels like "+T(f)+". Dress for about "+T(f+15)+" and add a layer for after."+(f>=85?" Hot: go early, slow down, drink water.":"")});}
   if(act==="feet")heads.push({ic:"↗",h:"On your feet all day",p:"Moving around keeps you warmer, so you can go a little lighter than the plan, but keep the outer layer."});
-  if(wx.phrase)heads.push({ic:"“",h:"AccuWeather's summary",p:wx.phrase+"."});
+  if(wx.phrase)heads.push({ic:"“",h:"In a word",p:wx.phrase+"."});
   if(L.n&&(Math.abs(L.out)>=1||Math.abs(L.inn)>=1))heads.push({ic:"✎",h:"Adjusted for you",p:cap1([runs(L.out,"outside"),runs(L.inn,"inside")].filter(Boolean).join(" and "))+", so I dressed you for that. ("+L.n+" day"+(L.n>1?"s":"")+" of notes.)"});
 
   /* the numbers, explained */
@@ -846,7 +846,7 @@ function build(wx,plan){
     you:uv<3?"Nothing to do.":"Unprotected skin burns in about "+burnMin(uv)+" minutes."});
   if(wx.aq&&aqi==null)m.push({h:"Air quality",val:String(Math.round(wx.aq.index)),u:wx.aq.category,
     scale:{min:0,max:150,v:wx.aq.index,b:[[20,"#BDE5C8","low"],[50,"#FFF3A8","moderate"],[100,"#FFC27A","high"],[150,"#FF8FB8","very high"]]},
-    p:"Pollution on one scale (AccuWeather uses the Plume index, not the US AQI). Under 20 is clean; over 50 starts to bother people with asthma; over 100 bothers everyone.",
+    p:"Pollution on one scale. Under 20 is clean; over 50 starts to bother people with asthma; over 100 bothers everyone.",
     you:wx.aq.index<=50?"Fine for anything, including running outside.":"Go easier on outdoor workouts, especially if you have asthma."});
   if(aqi!=null)m.push({h:"Air quality",val:String(aqi),u:"AQI",
     scale:{min:0,max:200,v:aqi,b:[[50,"#BDE5C8","good"],[100,"#FFF3A8","moderate"],[150,"#FFC27A","sensitive"],[200,"#FF8FB8","unhealthy"]]},
